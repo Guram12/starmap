@@ -4,46 +4,75 @@ import styles from "./page.module.css";
 export default function Page() {
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>🌟 StarMap</h1>
-        <p className={styles.description}>
-          Welcome to <strong>StarMap</strong>, your guide to discovering the best places based on your preferences.
-          Set your criteria and explore the map to find restaurants, hotels, attractions, and more!
-        </p>
-
-        <div className={styles.features}>
-          <div className={styles.feature}>
-            <h3>🗺️ Explore Regions</h3>
-            <p>Search for places in your favorite cities or areas.</p>
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            ✨ Discover Amazing Places
           </div>
-          <div className={styles.feature}>
-            <h3>⭐ Filter by Ratings</h3>
-            <p>Find only the highest-rated places that meet your standards.</p>
-          </div>
-          <div className={styles.feature}>
-            <h3>📍 Customize Radius</h3>
-            <p>Adjust the search radius to find places near you.</p>
+          <h1 className={styles.heroTitle}>
+            Find Your Perfect
+            <span className={styles.highlight}> StarMap </span>
+            Destination
+          </h1>
+          <p className={styles.heroSubtitle}>
+            Explore restaurants, hotels, and attractions with personalized recommendations
+            based on your preferences and ratings.
+          </p>
+          <div className={styles.heroActions}>
+            <Link href="/auth/register" className={styles.primaryBtn}>
+              Get Started Free
+            </Link>
+            <Link href="/map" className={styles.secondaryBtn}>
+              🗺️ Explore Now
+            </Link>
           </div>
         </div>
+      </section>
 
-        <div className={styles.ctas}>
-          <Link href="/preferences" className={styles.primaryBtn}>
-            Set Preferences
-          </Link>
-          <Link href="/map" className={styles.secondaryBtn}>
-            Explore Map
+      <section className={styles.infoSection}>
+        <div className={styles.infoCard}>
+          <div className={styles.iconWrapper}>
+            <span className={styles.icon}>💾</span>
+          </div>
+          <h3>Account Benefits</h3>
+          <p>
+            <strong>With Registration:</strong> All preferences and search history saved permanently.
+            <br />
+            <strong>Without Account:</strong> Data stored in browser only - lost on refresh.
+          </p>
+        </div>
+      </section>
+
+      <section className={styles.features}>
+        <h2 className={styles.sectionTitle}>Why Choose StarMap?</h2>
+        <div className={styles.featureGrid}>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>🌍</div>
+            <h3>Global Search</h3>
+            <p>Search any city or region worldwide</p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>⭐</div>
+            <h3>Smart Filtering</h3>
+            <p>Filter by ratings, distance, and type</p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>🎯</div>
+            <h3>Personalized</h3>
+            <p>Tailored recommendations just for you</p>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.cta}>
+        <div className={styles.ctaContent}>
+          <h2>Ready to Explore?</h2>
+          <p>Join for discovering amazing places</p>
+          <Link href="/preferences" className={styles.ctaBtn}>
+            Set Your Preferences
           </Link>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <p>© 2025 StarMap. All rights reserved.</p>
-        <nav>
-          <Link href="/auth/login">Login</Link>
-          <Link href="/auth/register">Register</Link>
-          <Link href="/preferences">Preferences</Link>
-        </nav>
-      </footer>
+      </section>
     </div>
   );
 }
