@@ -1,9 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUser } from '@/lib/auth'
 import jwt from 'jsonwebtoken'
-
-
-
 
 export async function POST(request: NextRequest) {
   try {

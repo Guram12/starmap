@@ -4,6 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import styles from './Login.module.css'
+import { useAuth } from '@/app/AuthProvider'
+
+
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -13,6 +16,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { login } = useAuth() // Get login function from context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +38,9 @@ export default function Login() {
       const data = await response.json()
 
       if (response.ok) {
-        // Login successful - redirect to map or home
+        // Update auth context
+        login(data.user)
+        // Redirect to map
         router.push('/map')
       } else {
         setError(data.error || 'Login failed')
