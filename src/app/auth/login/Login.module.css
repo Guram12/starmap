@@ -55,6 +55,7 @@
   font-size: 1rem;
   transition: all 0.2s;
   background: #f9fafb;
+  color: #1f2937;
 }
 
 .input:focus {
@@ -104,6 +105,26 @@
 .registerLink:hover {
   color: #0051a2;
   text-decoration: underline;
+}
+.error {
+  background: #fee2e2;
+  border: 1px solid #f87171;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.submitBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.submitBtn:disabled:hover {
+  background: #9ca3af;
+  transform: none;
 }
 
 /* Responsive design */

@@ -1,47 +1,105 @@
-import Link from 'next/link';
-import styles from './Login.module.css';
+'use client'
 
-export default function Login() { 
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import styles from './Login.module.css'
+
+export default function Login() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Login successful - redirect to map or home
+        router.push('/map')
+      } else {
+        setError(data.error || 'Login failed')
+      }
+    } catch (error) {
+      setError('Network error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className={styles.loginPage}>
       <div className={styles.container}>
         <h1 className={styles.title}>Welcome Back</h1>
         <p className={styles.subtitle}>Sign in to your StarMap account</p>
-        
-        <form className={styles.form}>
+
+        {error && (
+          <div className={styles.error}>
+            {error}
+          </div>
+        )}
+
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>
-              Username
+              Username or Email
             </label>
-            <input 
+            <input
               id="username"
-              type="text" 
-              name="username" 
+              type="text"
+              name="username"
               className={styles.input}
-              placeholder="Enter your username"
-              required 
+              placeholder="Enter your username or email"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              required
             />
           </div>
-          
+
           <div className={styles.field}>
             <label htmlFor="password" className={styles.label}>
               Password
             </label>
-            <input 
+            <input
               id="password"
-              type="password" 
-              name="password" 
+              type="password"
+              name="password"
               className={styles.input}
               placeholder="Enter your password"
-              required 
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
             />
           </div>
-          
-          <button type="submit" className={styles.submitBtn}>
-            Sign In
+
+          <button
+            type="submit"
+            className={styles.submitBtn}
+            disabled={loading}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-        
+
         <div className={styles.footer}>
           <p>
             Don&apos;t have an account?{' '}
@@ -52,5 +110,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }
