@@ -1,0 +1,243 @@
+.preferencesPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 600px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input,
+.select {
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: #f9fafb;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.rangeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rangeLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rangeValue {
+  font-weight: 700;
+  color: #667eea;
+  padding: 0.25rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.rangeInput {
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: #e5e7eb;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.rangeInput::-webkit-slider-thumb:hover {
+  background: #5a6fd8;
+  transform: scale(1.1);
+}
+
+.rangeInput::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.starsDisplay {
+  color: #f59e0b;
+  font-size: 1.2rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.actionBtn {
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.saveBtn {
+  background: #667eea;
+  color: white;
+}
+
+.saveBtn:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.mapBtn {
+  background: #10b981;
+  color: white;
+}
+
+.mapBtn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.homeBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.homeBtn:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+}
+
+.successMessage {
+  background: #d1fae5;
+  border: 1px solid #10b981;
+  color: #065f46;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .preferencesPage {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 2rem 1.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actionBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}
