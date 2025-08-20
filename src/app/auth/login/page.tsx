@@ -1,21 +1,56 @@
 import Link from 'next/link';
+import styles from './Login.module.css';
 
 export default function Login() { 
   return (
-    <div className="login-page">
-      <h1>Login</h1>
-      <form>
-        <label>
-          Username:
-          <input type="text" name="username" required />
-        </label>
-        <label>
-          Password:
-          <input type="password" name="password" required />
-        </label>
-        <button type="submit">Login</button>
-      </form>
-      <p>Don't have an account? <Link href="/auth/register">Register here</Link></p>
+    <div className={styles.loginPage}>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Welcome Back</h1>
+        <p className={styles.subtitle}>Sign in to your StarMap account</p>
+        
+        <form className={styles.form}>
+          <div className={styles.field}>
+            <label htmlFor="username" className={styles.label}>
+              Username
+            </label>
+            <input 
+              id="username"
+              type="text" 
+              name="username" 
+              className={styles.input}
+              placeholder="Enter your username"
+              required 
+            />
+          </div>
+          
+          <div className={styles.field}>
+            <label htmlFor="password" className={styles.label}>
+              Password
+            </label>
+            <input 
+              id="password"
+              type="password" 
+              name="password" 
+              className={styles.input}
+              placeholder="Enter your password"
+              required 
+            />
+          </div>
+          
+          <button type="submit" className={styles.submitBtn}>
+            Sign In
+          </button>
+        </form>
+        
+        <div className={styles.footer}>
+          <p>
+            Don't have an account?{' '}
+            <Link href="/auth/register" className={styles.registerLink}>
+              Register here
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
