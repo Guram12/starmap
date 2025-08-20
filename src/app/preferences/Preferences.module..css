@@ -1,0 +1,81 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-weight: 600;
+  color: #333;
+}
+
+.field input,
+.field select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.field input[type="range"] {
+  padding: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.saveBtn,
+.mapBtn,
+.homeBtn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.saveBtn {
+  background: #0070f3;
+  color: white;
+}
+
+.saveBtn:hover {
+  background: #0051a2;
+}
+
+.mapBtn {
+  background: #10b981;
+  color: white;
+}
+
+.mapBtn:hover {
+  background: #059669;
+}
+
+.homeBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.homeBtn:hover {
+  background: #4b5563;
+}
