@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import styles from './Header.module.css';  // Change this line
 
+
+
+
 export default function Header() {
+
+  
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -21,6 +26,10 @@ export default function Header() {
           </Link>
           <Link href="/auth/login" className={styles.navLink}>
             Login
+          </Link>
+
+          <Link href="/auth/register" className={styles.navLink}>
+            Register
           </Link>
         </nav>
       </div>
