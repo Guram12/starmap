@@ -1,4 +1,7 @@
 import { useState, useCallback } from 'react';
+import { majorCities } from '@/lib/major_cityes';
+
+
 
 interface Place {
   id: string;
@@ -25,9 +28,32 @@ export function usePlacesSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isMajorCity = useCallback((locationName: string): boolean => {
+    const normalizedLocation = locationName.toLowerCase().trim();
+    return majorCities.some(city =>
+      normalizedLocation.includes(city.toLowerCase()) ||
+      city.toLowerCase().includes(normalizedLocation)
+    );
+  }, []);
+
+  const getOptimalRadius = useCallback((locationName: string, requestedRadius: number): number => {
+    // Cap at 20km max
+    const maxRadius = 20;
+    const cityMaxRadius = 5;
+
+    if (isMajorCity(locationName)) {
+      return Math.min(requestedRadius, cityMaxRadius);
+    }
+
+    return Math.min(requestedRadius, maxRadius);
+  }, [isMajorCity]);
+
+
+
   const searchPlaces = useCallback(async (
     map: google.maps.Map,
-    params: SearchParams
+    params: SearchParams,
+    locationName?: string
   ) => {
     if (!map) return;
 
@@ -35,13 +61,17 @@ export function usePlacesSearch() {
     setError(null);
 
     try {
-      // Import the Places library to get access to the API
       const { Place } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
+
+      // Get optimal radius based on location
+      const optimalRadius = locationName ?
+        getOptimalRadius(locationName, params.radius) :
+        Math.min(params.radius, 20);
 
       const request = {
         fields: [
           'id',
-          'displayName', 
+          'displayName',
           'location',
           'rating',
           'formattedAddress',
@@ -53,20 +83,20 @@ export function usePlacesSearch() {
         ],
         locationRestriction: {
           center: params.location,
-          radius: params.radius * 1000, // Convert km to meters
+          radius: optimalRadius * 1000, // Convert km to meters
         },
         includedTypes: [params.type],
         maxResultCount: 20,
-        rankPreference: 'DISTANCE' as any, // Fix RankPreference issue
+        rankPreference: 'DISTANCE' as any,
         language: 'en-US',
         region: 'us',
       };
 
-      // Use the new searchNearby method
+      console.log(`Searching with radius: ${optimalRadius}km for location: ${locationName || 'Unknown'}`);
+
       const { places: results } = await Place.searchNearby(request);
 
       if (results && results.length > 0) {
-        // Filter by minimum rating if specified
         let filteredResults = results;
         if (params.minRating) {
           filteredResults = results.filter(
@@ -74,7 +104,6 @@ export function usePlacesSearch() {
           );
         }
 
-        // Transform to our interface
         const transformedPlaces: Place[] = filteredResults.map(place => ({
           id: place.id!,
           displayName: place.displayName || 'Unknown',
@@ -99,7 +128,7 @@ export function usePlacesSearch() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getOptimalRadius]);
 
   const geocodeLocation = useCallback(async (locationName: string): Promise<google.maps.LatLng | null> => {
     return new Promise((resolve) => {
@@ -114,5 +143,5 @@ export function usePlacesSearch() {
     });
   }, []);
 
-  return { places, loading, error, searchPlaces, geocodeLocation };
+  return { places, loading, error, searchPlaces, geocodeLocation, isMajorCity, getOptimalRadius };
 }

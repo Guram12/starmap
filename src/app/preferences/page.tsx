@@ -140,7 +140,7 @@ export default function Preferences() {
                 id="searchRadius"
                 type="range"
                 min="1"
-                max="50"
+                max="20"
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(Number(e.target.value))}
                 className={styles.rangeInput}

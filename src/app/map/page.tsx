@@ -32,10 +32,10 @@ export default function MapPage() {
   const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
 
   const { saveSearchToHistory } = useSearchHistory();
-const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
 
-  
+
 
   //=====================================    Load places when map and preferences are ready     ====================================
   useEffect(() => {
@@ -74,7 +74,7 @@ const { isAuthenticated } = useAuth();
             radius: preferences.searchRadius,
             type: preferences.placeType,
             minRating: preferences.minStars
-          });
+          }, preferences.region); // Pass the region name
         }
       } catch (error) {
         console.error('Search failed:', error);
@@ -87,7 +87,6 @@ const { isAuthenticated } = useAuth();
   }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation]);
 
 
-  
   useEffect(() => {
     if (isAuthenticated && places.length > 0 && preferences.region) {
       saveSearchToHistory({
