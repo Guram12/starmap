@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';  // ✅ Correct
 // Define the place type options
-type PlaceType = 'restaurant' | 'hotel' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
+type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
 
 export default function Preferences() {
   const [region, setRegion] = useState('');
@@ -46,7 +46,7 @@ export default function Preferences() {
   const getPlaceTypeIcon = (type: PlaceType): string => {
     const icons: Record<PlaceType, string> = {
       restaurant: '🍽️',
-      hotel: '🏨',
+      lodging: '🏨',
       tourist_attraction: '🏛️',
       shopping_mall: '🛍️',
       hospital: '🏥'
@@ -93,7 +93,7 @@ export default function Preferences() {
               className={styles.select}
             >
               <option value="restaurant">🍽️ Restaurants</option>
-              <option value="hotel">🏨 Hotels</option>
+              <option value="lodging">🏨 Lodging</option>
               <option value="tourist_attraction">🏛️ Tourist Attractions</option>
               <option value="shopping_mall">🛍️ Shopping Centers</option>
               <option value="hospital">🏥 Healthcare</option>
@@ -118,7 +118,7 @@ export default function Preferences() {
                 type="range"
                 min="1"
                 max="5"
-                step="0.5"
+                step="0.1"
                 value={minStars}
                 onChange={(e) => setMinStars(Number(e.target.value))}
                 className={styles.rangeInput}
@@ -140,7 +140,7 @@ export default function Preferences() {
                 id="searchRadius"
                 type="range"
                 min="1"
-                max="50"
+                max="20"
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(Number(e.target.value))}
                 className={styles.rangeInput}
@@ -161,12 +161,12 @@ export default function Preferences() {
             <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
               🗺️ Go to Map
             </Link>
-            <Link href="/" className={`${styles.actionBtn} ${styles.homeBtn}`}>
-              🏠 Back to Home
-            </Link>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
+
+

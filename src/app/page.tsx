@@ -1,6 +1,12 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 
+
+
+
+
+
+
 export default function Page() {
   return (
     <div className={styles.page}>
@@ -76,3 +82,9 @@ export default function Page() {
     </div>
   );
 }
+
+
+
+// CREATE DATABASE starmap_db;
+// CREATE USER starmap_user WITH ENCRYPTED PASSWORD 'starmap_password';
+// GRANT ALL PRIVILEGES ON DATABASE starmap_db TO starmap_user;

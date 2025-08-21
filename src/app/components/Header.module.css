@@ -3,12 +3,12 @@
   border-bottom: 1px solid #e5e7eb;
   position: fixed;
   top: 10px;
-  left: 50%;                    
+  left: 50%;
   transform: translateX(-50%);
   z-index: 50;
-  width: 80%;                   
-  max-width: 900px;           
-  min-width: 600px;           
+  width: 80%;
+  max-width: 900px;
+  min-width: 600px;
   height: 60px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   border-radius: 22px;
@@ -21,7 +21,13 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  width: 100%;               
+  width: 100%;
+}
+
+.logo_name_cont{
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo {
@@ -33,6 +39,14 @@
 
 .nav {
   display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* NEW: Container for nav items with indicator */
+.navItems {
+  position: relative;
+  display: flex;
   gap: 10px;
   align-items: center;
 }
@@ -43,29 +57,113 @@
   font-weight: 600;
   padding: 5px;
   border-radius: 6px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .navLink:hover {
-  background-color: #f3f4f6;
+  color: #1f2937;
+  background-color: rgba(243, 244, 246, 0.5);
+}
+
+.navLink.active {
+  color: #1f2937;
+  font-weight: 700;
+}
+
+/* NEW: Animated underline indicator */
+.indicator {
+  position: absolute;
+  bottom: -2px;
+  height: 3px;
+  background: black;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+/* Alternative: Glowing indicator */
+.indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  filter: blur(4px);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.loadingSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+}
+
+.logoutBtn {
+  background-color: transparent;
+  border: 0px;
+}
+
+.logout_Icon {
+  color: #374151;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout_Icon:hover {
+  color: #1f2937;
+  transform: scale(1.1);
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #1e1e1e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: uppercase;
 }
 
 @media (max-width: 768px) {
   .header {
-    width: 95%;               /* Wider on mobile */
-    min-width: 320px;         /* Smaller minimum on mobile */
+    width: 95%;
+    min-width: 320px;
   }
-  
+
   .container {
     padding: 1rem;
   }
-  
+
   .nav {
-    gap: 1rem;
+    gap: 15px;
   }
-  
+
+  .navItems {
+    gap: 8px;
+  }
+
   .navLink {
-    padding: 0.25rem 0.5rem;
+    padding: 6px 12px;
     font-size: 0.9rem;
   }
 }

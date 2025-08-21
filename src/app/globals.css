@@ -37,8 +37,62 @@ a {
   text-decoration: none;
 }
 
+
+
+
+
+
+/* Global scrollbar styles */
+* {
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: black #f1f5f9;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 4px; /* Ultra-thin scrollbar */
+}
+
+*::-webkit-scrollbar-track {
+  background: #326191; /* Light gray track */
+  border-radius: 2px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  border-radius: 2px;
+  border: none;
+}
+
+
+/* Specific elements that might need different styling */
+body::-webkit-scrollbar {
+  width: 8px; /* Slightly wider for main page scrollbar */
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+}
+
+/* For dark backgrounds, you might want different colors */
+.dark-theme *::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.8); /* Darker thumb for dark themes */
+}
+
+.dark-theme *::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5); /* Darker track for dark themes */
+}
+
+
+
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
 }
+
+
+
