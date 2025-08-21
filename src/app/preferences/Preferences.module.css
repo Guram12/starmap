@@ -67,6 +67,7 @@
   transition: all 0.2s;
   background: #f9fafb;
   width: 100%;
+  color: #374151;
 }
 
 .input:focus,
