@@ -39,13 +39,13 @@ export default function Login() {
 
       if (response.ok) {
         // Update auth context
-        login(data.user)
+        await login(formData.username, formData.password)
         // Redirect to map
         router.push('/map')
       } else {
         setError(data.error || 'Login failed')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Network error. Please try again.')
     } finally {
       setLoading(false)

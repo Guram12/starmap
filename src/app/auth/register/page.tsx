@@ -48,7 +48,7 @@ export default function Register() {
         // 🚀 NEW: Auto-login after successful registration
         if (data.autoLogin && data.user) {
           // Update auth context
-          login(data.user)
+          await login(formData.username, formData.password)
           // Redirect to map or home
           router.push('/map?welcome=true') // Optional welcome parameter
         } else {
@@ -58,7 +58,7 @@ export default function Register() {
       } else {
         setError(data.error || 'Registration failed')
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Network error. Please try again.')
     } finally {
       setLoading(false)

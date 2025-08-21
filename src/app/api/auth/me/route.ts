@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       )
     }
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number; username: string }
 
     // Get user from database
     const user = await prisma.user.findUnique({

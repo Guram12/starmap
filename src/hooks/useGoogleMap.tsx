@@ -22,7 +22,6 @@ export function useGoogleMap(options: MapOptions = {}) {
         });
 
         const { Map } = await loader.importLibrary('maps') as google.maps.MapsLibrary;
-        const { Place } = await loader.importLibrary('places') as google.maps.PlacesLibrary;
 
         if (mapRef.current) {
           const mapInstance = new Map(mapRef.current, {
@@ -45,7 +44,7 @@ export function useGoogleMap(options: MapOptions = {}) {
     };
 
     initMap();
-  }, []);
+  }, [options.center, options.zoom]);
 
   return { mapRef, map, isLoaded, error };
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import styles from './Map.module.css';
@@ -161,12 +160,19 @@ export default function MapPage() {
 
   // ========================================    Create info window content   ==================================================   
 
-  const createInfoWindowContent = (place: any): string => {
+  const createInfoWindowContent = (place: {
+    displayName: string;
+    photos?: google.maps.places.Photo[];
+    priceLevel?: google.maps.places.PriceLevel | null;
+    rating?: number | null;
+    formattedAddress?: string | null;
+    websiteURI?: string | null;
+  }): string => {
     const photoUrl = place.photos && place.photos.length > 0
       ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
       : '';
 
-    const priceLevel = place.priceLevel ? '$'.repeat(place.priceLevel) : '';
+    const priceLevel = place.priceLevel ? '$'.repeat(Number(place.priceLevel)) : '';
 
     return `
       <div style="max-width: 250px; padding: 10px;">

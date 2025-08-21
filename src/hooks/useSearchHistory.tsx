@@ -33,7 +33,7 @@ export function useSearchHistory() {
       } else {
         setError(data.error || 'Failed to fetch search history');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Network error');
     } finally {
       setLoading(false);

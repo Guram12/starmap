@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = await response.json()
         setUser(userData.user)
       }
-    } catch (error) {
+    } catch (_error) {
       console.log('Not authenticated')
     } finally {
       setLoading(false)
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
       setUser(null)
-    } catch (error) {
+    } catch (_error) {
       console.error('Logout failed')
     }
   }

@@ -87,7 +87,7 @@ export function usePlacesSearch() {
         },
         includedTypes: [params.type],
         maxResultCount: 20,
-        rankPreference: 'DISTANCE' as any,
+        rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
         language: 'en-US',
         region: 'us',
       };
