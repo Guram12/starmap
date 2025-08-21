@@ -161,9 +161,6 @@ export default function Preferences() {
             <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
               🗺️ Go to Map
             </Link>
-            <Link href="/" className={`${styles.actionBtn} ${styles.homeBtn}`}>
-              🏠 Back to Home
-            </Link>
           </div>
         </form>
       </div>
@@ -173,5 +170,3 @@ export default function Preferences() {
 
 
 
-
-// AIzaSyDOQLep8QAZSpc6KNlXEoejETmUYQf00kg

@@ -169,6 +169,8 @@
 .saveBtn {
   background: #667eea;
   color: white;
+  min-width: 220px;
+
 }
 
 .saveBtn:hover {
@@ -180,6 +182,7 @@
 .mapBtn {
   background: #10b981;
   color: white;
+  min-width: 220px;
 }
 
 .mapBtn:hover {

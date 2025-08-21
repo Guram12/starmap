@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useGoogleMap } from '../useGoogleMap';
 import { usePlacesSearch } from '../usePlacesSearch';
 import styles from './Map.module.css';
+import { MapPinned } from 'lucide-react';
+
+
 
 interface Preferences {
   region: string;
@@ -176,29 +179,44 @@ export default function MapPage() {
 
   return (
     <div className={styles.mapPage}>
-      {/* Your existing JSX structure remains the same */}
       <div className={styles.container}>
 
         <div className={styles.content}>
+
           <div className={styles.sidebar}>
             {/* Your existing sidebar content */}
             <div className={styles.settingsCard}>
               <h3 className={styles.cardTitle}>⚙️ Current Settings</h3>
-              {/* Settings display */}
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>📍 Region:</span>
+                <span className={styles.settingValue}>{preferences.region || 'Not set'}</span>
+              </div>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>🛍️ Place Type:</span>
+                <span className={styles.settingValue}>{preferences.placeType}</span>
+              </div>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>⭐ Min Stars:</span>
+                <span className={styles.settingValue}>{preferences.minStars}</span>
+              </div>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>🎯 Search Radius:</span>
+                <span className={styles.settingValue}>{preferences.searchRadius} km</span>
+              </div>
+
             </div>
 
-            <div className={styles.resultsCard}>
-              <h3 className={styles.cardTitle}>📍 Results ({places.length})</h3>
+            <div >
+              <h3 className={styles.result_cardTitle}>📍 Results ({places.length})</h3>
+
               {loading && <p>Searching places...</p>}
               {searchError && <p style={{ color: 'red' }}>{searchError}</p>}
               {places.length > 0 && (
                 <div className={styles.placesList}>
-                  {places.slice(0, 5).map((place) => (
+                  {places.map((place) => (
                     <div key={place.id} className={styles.placeItem}>
                       <div className={styles.placeName}>{place.displayName}</div>
-                      <div className={styles.placeRating}>
-                        ⭐ {place.rating || 'N/A'}
-                      </div>
+                      <div className={styles.placeRating}>⭐ {place.rating || 'N/A'}</div>
                     </div>
                   ))}
                 </div>
@@ -210,7 +228,9 @@ export default function MapPage() {
 
           <div className={styles.mapContainer}>
             <div className={styles.mapHeader}>
-              <h3 className={styles.mapTitle}>📍 Interactive Map</h3>
+              <h3 className={styles.mapTitle}>
+                <MapPinned className={styles.mapIcon} /> Interactive Map
+              </h3>
               <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
                 {preferences.region ? `Searching in ${preferences.region}` : 'Set region to search'}
               </span>
@@ -226,7 +246,7 @@ export default function MapPage() {
                 className={styles.mapDiv}
                 style={{
                   width: '100%',
-                  height: '600px',
+                  height: '100%',
                   borderRadius: '12px',
                   backgroundColor: '#20499B'
                 }}

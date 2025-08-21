@@ -1,13 +1,13 @@
 .mapPage {
   min-height: 100vh;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  padding: 2rem;
   padding-top: 80px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  height: calc(100vh - 100px);
 }
 
 .title {
@@ -27,13 +27,14 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 2rem;
-  margin-bottom: 2rem;
+  height: 100%;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 100%;
 }
 
 .settingsCard {
@@ -52,6 +53,54 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+}
+
+.result_cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  padding-left: 15px;
+  border-radius: 8px;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.placesList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: calc(100vh - 450px);
+  overflow-y: auto;
+    /* Custom scrollbar styles */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #1f2937 #f1f5f9; /* thumb and track color for Firefox */
+}
+
+.placeItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.placeItem:hover {
+  background: #f9fafb;
+  cursor: pointer;
 }
 
 .settingItem {
@@ -67,7 +116,7 @@
 }
 
 .settingLabel {
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
 }
 
@@ -143,23 +192,23 @@
 }
 
 .mapContainer {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   min-height: 500px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .mapHeader {
   background: #f8fafc;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 12px;
 }
 
 .mapTitle {
@@ -179,6 +228,10 @@
   padding: 3rem;
   color: #6b7280;
   text-align: center;
+}
+
+.mapDiv{
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .placeholderIcon {
@@ -207,8 +260,13 @@
   color: #6b7280;
 }
 
-.placeRating{
+.placeRating {
   color: black;
+}
+
+.placeName {
+  font-weight: 600;
+  color: #1f2937;
 }
 
 
@@ -222,8 +280,47 @@
   margin-right: 0.5rem;
 }
 
+/* ======================================= scrollbar stykles ========================= */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.placesList::-webkit-scrollbar {
+  width: 6px; /* Make scrollbar thinner */
+}
+
+.placesList::-webkit-scrollbar-track {
+  background: #f1f5f9; /* Light gray track */
+  border-radius: 10px;
+}
+
+.placesList::-webkit-scrollbar-thumb {
+  background: #ffffff; /* White thumb */
+  border-radius: 10px;
+  border: 1px solid #e2e8f0; /* Subtle border for visibility */
+}
+
+.placesList::-webkit-scrollbar-thumb:hover {
+  background: #f8fafc; /* Slightly darker on hover */
+  border: 1px solid #cbd5e1;
+}
+
+/* Alternative: Even thinner scrollbar */
+.placesList::-webkit-scrollbar {
+  width: 4px; /* Ultra-thin scrollbar */
+}
+
+.placesList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  border-radius: 2px;
+  border: none;
+}
+
+.placesList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 1); /* Solid white on hover */
+}
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive design */
@@ -231,7 +328,7 @@
   .content {
     grid-template-columns: 1fr;
   }
-  
+
   .mapContainer {
     order: -1;
   }
@@ -241,19 +338,19 @@
   .mapPage {
     padding: 1rem;
   }
-  
+
   .title {
     font-size: 2rem;
   }
-  
+
   .actions {
     flex-direction: column;
   }
-  
+
   .actionBtn {
     justify-content: center;
   }
-  
+
   .settingItem {
     flex-direction: column;
     align-items: flex-start;
