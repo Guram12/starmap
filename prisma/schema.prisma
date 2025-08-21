@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,11 +8,33 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  username String   @unique
-  email    String   @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
-  
+
+  // Add relation to search history
+  searchHistory SearchHistory[]
+
   @@map("users")
+}
+
+// New SearchHistory model
+model SearchHistory {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  region       String
+  placeType    String
+  minStars     Float
+  searchRadius Int
+  resultsCount Int      @default(0)
+  searchedAt   DateTime @default(now())
+
+  // Relation to User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([searchedAt])
+  @@map("search_history")
 }

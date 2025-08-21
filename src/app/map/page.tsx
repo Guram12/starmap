@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useGoogleMap } from '../useGoogleMap';
-import { usePlacesSearch } from '../usePlacesSearch';
+import { useGoogleMap } from '../../hooks/useGoogleMap';
+import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import styles from './Map.module.css';
 import { MapPinned } from 'lucide-react';
-
+import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useAuth } from '../AuthProvider';
 
 
 interface Preferences {
@@ -30,9 +31,13 @@ export default function MapPage() {
 
   const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
 
-  // Load preferences from localStorage
+  const { saveSearchToHistory } = useSearchHistory();
+const { isAuthenticated } = useAuth();
 
 
+  
+
+  //=====================================    Load places when map and preferences are ready     ====================================
   useEffect(() => {
     console.log('Places updated:', places);
   }, [places]);
@@ -61,11 +66,9 @@ export default function MapPage() {
       try {
         const location = await geocodeLocation(preferences.region);
         if (location) {
-          // Center map on the location
           map.setCenter(location);
           map.setZoom(12);
 
-          // Search for places
           await searchPlaces(map, {
             location,
             radius: preferences.searchRadius,
@@ -82,6 +85,21 @@ export default function MapPage() {
       performSearch();
     }
   }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation]);
+
+
+  
+  useEffect(() => {
+    if (isAuthenticated && places.length > 0 && preferences.region) {
+      saveSearchToHistory({
+        region: preferences.region,
+        placeType: preferences.placeType,
+        minStars: preferences.minStars,
+        searchRadius: preferences.searchRadius,
+        resultsCount: places.length,
+      });
+    }
+  }, [places, preferences, isAuthenticated, saveSearchToHistory]);
+
 
   // =========================================  Update markers when places change  =============================================
   useEffect(() => {

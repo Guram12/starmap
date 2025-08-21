@@ -7,6 +7,9 @@ import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { LogOut } from 'lucide-react';
 import { BarLoader } from 'react-spinners';
+import Logo from './Logo';
+
+
 
 export default function Header() {
   const { user, isAuthenticated, logout, loading } = useAuth();
@@ -19,6 +22,8 @@ export default function Header() {
     { href: '/', label: 'Home' },
     { href: '/preferences', label: 'Preferences' },
     { href: '/map', label: 'Map' },
+    { href: '/history', label: 'History' },
+
   ];
 
   useEffect(() => {
@@ -32,11 +37,11 @@ export default function Header() {
 
       // Look for active nav item (including auth buttons)
       const activeNavItem = navRef.current.querySelector(`[data-path="${pathname}"]`) as HTMLElement;
-      
+
       if (activeNavItem) {
         const navRect = navRef.current.getBoundingClientRect();
         const itemRect = activeNavItem.getBoundingClientRect();
-        
+
         setIndicatorStyle({
           left: itemRect.left - navRect.left,
           width: itemRect.width,
@@ -49,7 +54,7 @@ export default function Header() {
 
     // Small delay to ensure DOM is ready
     setTimeout(updateIndicator, 50);
-    
+
     // Update on window resize
     window.addEventListener('resize', updateIndicator);
     return () => window.removeEventListener('resize', updateIndicator);
@@ -58,35 +63,38 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          StarMap
-        </Link>
+        <div className={styles.logo_name_cont} >
+          <Logo />
+          <Link href="/" className={styles.logo}>
+            StarMap
+          </Link>
+        </div>
 
         <nav className={styles.nav} ref={navRef}>
           <div className={styles.navItems}>
             {navItems.map((item) => (
-              <Link 
+              <Link
                 key={item.href}
-                href={item.href} 
+                href={item.href}
                 className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
                 data-path={item.href}
               >
                 {item.label}
               </Link>
             ))}
-            
+
             {/* Auth buttons with data-path for indicator */}
             {!isAuthenticated && (
               <>
-                <Link 
-                  href="/auth/login" 
+                <Link
+                  href="/auth/login"
                   className={`${styles.navLink} ${pathname === '/auth/login' ? styles.active : ''}`}
                   data-path="/auth/login"
                 >
                   Login
                 </Link>
-                <Link 
-                  href="/auth/register" 
+                <Link
+                  href="/auth/register"
                   className={`${styles.navLink} ${pathname === '/auth/register' ? styles.active : ''}`}
                   data-path="/auth/register"
                 >
@@ -94,9 +102,9 @@ export default function Header() {
                 </Link>
               </>
             )}
-            
+
             {/* Animated underline indicator */}
-            <div 
+            <div
               className={styles.indicator}
               style={{
                 left: `${indicatorStyle.left}px`,
