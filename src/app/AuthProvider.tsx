@@ -11,8 +11,8 @@ interface User {
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
-  login: (userData: User) => void
-  logout: () => void
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
+  logout: () => Promise<void>
   loading: boolean
 }
 
@@ -41,8 +41,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const login = (userData: User) => {
-    setUser(userData)
+  const login = async (username: string, password: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setUser(data.user)
+        return { success: true }
+      } else {
+        return { success: false, error: data.error }
+      }
+    } catch (_error) {
+      return { success: false, error: 'Network error' }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const logout = async () => {
@@ -59,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user,
     login,
     logout,
-    loading
+    loading,
   }
 
   return (

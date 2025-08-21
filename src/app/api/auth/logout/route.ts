@@ -16,10 +16,10 @@ export async function POST() {
     
     return response
     
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
-      { error: 'Logout failed' },
+      { success: false, error: 'Logout failed' },
       { status: 500 }
-    )
+    );
   }
 }

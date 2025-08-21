@@ -40,11 +40,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ user })
 
 
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
-      { error: 'Invalid token' },
-      { status: 401 }
-    )
+      { success: false, error: 'Authentication check failed' },
+      { status: 500 }
+    );
   }
 }
 
