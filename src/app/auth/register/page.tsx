@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/AuthProvider'
 import styles from './Register.module.css'
 
 export default function Register() {
@@ -15,6 +16,7 @@ export default function Register() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { login } = useAuth() // Get login function from context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,7 +45,16 @@ export default function Register() {
       const data = await response.json()
 
       if (response.ok) {
-        router.push('/auth/login?message=Registration successful! Please login.')
+        // 🚀 NEW: Auto-login after successful registration
+        if (data.autoLogin && data.user) {
+          // Update auth context
+          login(data.user)
+          // Redirect to map or home
+          router.push('/map?welcome=true') // Optional welcome parameter
+        } else {
+          // Fallback: redirect to login
+          router.push('/auth/login?message=Registration successful! Please login.')
+        }
       } else {
         setError(data.error || 'Registration failed')
       }
@@ -67,6 +78,7 @@ export default function Register() {
         )}
         
         <form className={styles.form} onSubmit={handleSubmit}>
+          {/* Your existing form fields */}
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>
               Username
@@ -136,7 +148,7 @@ export default function Register() {
             className={styles.submitBtn}
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Create Account & Sign In'}
           </button>
         </form>
         

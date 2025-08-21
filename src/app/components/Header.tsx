@@ -5,40 +5,17 @@ import { useAuth } from '../AuthProvider';
 import styles from './Header.module.css';
 import { useEffect } from 'react';
 import { LogOut } from 'lucide-react';
-
+import { BarLoader } from 'react-spinners';
 
 
 export default function Header() {
   const { user, isAuthenticated, logout, loading } = useAuth();
-
-
-
 
   useEffect(() => {
     console.log('User authentication status:', isAuthenticated);
   }, [isAuthenticated]);
 
 
-
-
-
-
-
-
-
-  
-  if (loading) {
-    return (
-      <header className={styles.header}>
-        <div className={styles.container}>
-          <Link href="/" className={styles.logo}>
-            StarMap
-          </Link>
-          <div>Loading...</div>
-        </div>
-      </header>
-    );
-  }
 
   return (
     <header className={styles.header}>
@@ -58,25 +35,38 @@ export default function Header() {
             Map
           </Link>
 
-          {isAuthenticated ? (
-            <>
-              <span className={styles.user_name}>
-               {user?.username}
-              </span>
-              <button onClick={logout} className={styles.logoutBtn}>
-                <LogOut  className={styles.logoutIcon} />
-              </button>
-            </>
+          {loading ? (
+            <div className={styles.loadingSpinner}>
+              <BarLoader speedMultiplier={2}
+              />
+            </div>
           ) : (
             <>
-              <Link href="/auth/login" className={styles.navLink}>
-                Login
-              </Link>
-              <Link href="/auth/register" className={styles.navLink}>
-                Register
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className={styles.userSection}>
+                    <div className={styles.avatar}>
+                      {user?.username?.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                  <button onClick={logout} className={styles.logoutBtn}>
+                    <LogOut className={styles.logout_Icon} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" className={styles.navLink}>
+                    Login
+                  </Link>
+                  <Link href="/auth/register" className={styles.navLink}>
+                    Register
+                  </Link>
+                </>
+              )}
             </>
           )}
+
+
         </nav>
       </div>
     </header>

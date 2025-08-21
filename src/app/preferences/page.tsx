@@ -118,7 +118,7 @@ export default function Preferences() {
                 type="range"
                 min="1"
                 max="5"
-                step="0.5"
+                step="0.1"
                 value={minStars}
                 onChange={(e) => setMinStars(Number(e.target.value))}
                 className={styles.rangeInput}
