@@ -24,7 +24,9 @@ export default function MapPage() {
     searchRadius: 5
   });
   const [prefsLoaded, setPrefsLoaded] = useState(false);
-  const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [lastSearchTime, setLastSearchTime] = useState(0);
+  const MIN_SEARCH_INTERVAL = 3000; // 3 seconds between searches
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
 
@@ -62,12 +64,20 @@ export default function MapPage() {
     const performSearch = async () => {
       if (!map || !preferences.region || !isLoaded) return;
 
+      // Rate limiting
+      const now = Date.now();
+      if (now - lastSearchTime < MIN_SEARCH_INTERVAL) {
+        console.log('Search rate limited');
+        return;
+      }
+
       try {
         const location = await geocodeLocation(preferences.region);
         if (location) {
           map.setCenter(location);
           map.setZoom(12);
 
+          setLastSearchTime(now);
           await searchPlaces(map, {
             location,
             radius: preferences.searchRadius,
@@ -83,7 +93,7 @@ export default function MapPage() {
     if (prefsLoaded && preferences.region) {
       performSearch();
     }
-  }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation]);
+  }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation, lastSearchTime]);
 
 
   useEffect(() => {
@@ -104,31 +114,26 @@ export default function MapPage() {
     if (!map || !places.length) return;
 
     // Clear existing markers
-    markers.forEach(marker => marker.map = null);
+    markers.forEach(marker => marker.setMap(null));
 
-    // Create new markers using Advanced Markers (new API)
+    // Create new markers using legacy Marker API (cheaper)
     const newMarkers = places.map(place => {
-      // Create marker element
-      const markerElement = document.createElement('div');
-      markerElement.innerHTML = getMarkerIcon(preferences.placeType);
-      markerElement.style.width = '32px';
-      markerElement.style.height = '32px';
-      markerElement.style.borderRadius = '50%';
-      markerElement.style.display = 'flex';
-      markerElement.style.alignItems = 'center';
-      markerElement.style.justifyContent = 'center';
-      markerElement.style.backgroundColor = '#ffffff';
-      markerElement.style.border = '2px solid #1f2937';
-      markerElement.style.cursor = 'pointer';
-
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+      const marker = new google.maps.Marker({
         map,
         position: place.location,
-        content: markerElement,
         title: place.displayName,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="#1f2937"/>
+              <text x="12" y="16" text-anchor="middle" fill="white" font-size="12">${getMarkerIcon(preferences.placeType)}</text>
+            </svg>`
+          )}`,
+          scaledSize: new google.maps.Size(32, 32),
+        }
       });
 
-      // Add info window
+      // Add info window with minimal content
       const infoWindow = new google.maps.InfoWindow({
         content: createInfoWindowContent(place)
       });
@@ -162,29 +167,18 @@ export default function MapPage() {
 
   const createInfoWindowContent = (place: {
     displayName: string;
-    photos?: google.maps.places.Photo[];
-    priceLevel?: google.maps.places.PriceLevel | null;
     rating?: number | null;
     formattedAddress?: string | null;
-    websiteURI?: string | null;
   }): string => {
-    const photoUrl = place.photos && place.photos.length > 0
-      ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
-      : '';
-
-    const priceLevel = place.priceLevel ? '$'.repeat(Number(place.priceLevel)) : '';
-
+    // Simplified info window - no photos or expensive data
     return `
-      <div style="max-width: 250px; padding: 10px;">
-        ${photoUrl ? `<img src="${photoUrl}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />` : ''}
-        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #1f2937;">${place.displayName}</h3>
+      <div style="max-width: 200px; padding: 8px;">
+        <h3 style="margin: 0 0 4px 0; font-size: 14px; color: #1f2937;">${place.displayName}</h3>
         <div style="display: flex; align-items: center; margin-bottom: 4px;">
           <span style="color: #fbbf24; margin-right: 4px;">⭐</span>
           <span style="font-weight: 600; color: #374151;">${place.rating || 'N/A'}</span>
         </div>
-        <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">${place.formattedAddress || 'Address not available'}</p>
-        ${priceLevel ? `<p style="margin: 4px 0; color: #10b981; font-size: 14px;">Price: ${priceLevel}</p>` : ''}
-        ${place.websiteURI ? `<a href="${place.websiteURI}" target="_blank" style="color: #3b82f6; font-size: 14px;">Visit Website</a>` : ''}
+        <p style="margin: 0; color: #6b7280; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
       </div>
     `;
   };
@@ -264,16 +258,18 @@ export default function MapPage() {
                 <p>❌ Error loading map: {mapError}</p>
               </div>
             ) : (
-              <div
-                ref={mapRef}
-                className={styles.mapDiv}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '12px',
-                  backgroundColor: '#20499B'
-                }}
-              />
+              <>
+                <div
+                  ref={mapRef}
+                  className={styles.mapDiv}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '12px',
+                    backgroundColor: '#20499B'
+                  }}
+                />
+              </>
             )}
           </div>
         </div>

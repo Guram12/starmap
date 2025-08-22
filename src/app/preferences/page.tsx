@@ -140,11 +140,14 @@ export default function Preferences() {
                 id="searchRadius"
                 type="range"
                 min="1"
-                max="20"
+                max="10"
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(Number(e.target.value))}
                 className={styles.rangeInput}
               />
+              <div style={{ fontSize: '12px', color: '#f59e0b', marginTop: '4px', fontWeight: '500' }}>
+                ⚠️ In large cities, only the 15 nearest best and nearest places will be shown
+              </div>
             </div>
           </div>
 
