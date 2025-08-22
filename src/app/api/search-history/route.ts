@@ -45,6 +45,14 @@ export async function POST(request: NextRequest) {
     
     const { region, placeType, minStars, searchRadius, resultsCount, places } = body;
 
+    console.log('📝 SAVING SEARCH HISTORY:', {
+      userId: decoded.userId,
+      region,
+      placeType,
+      placesCount: places?.length || 0,
+      hasPlaces: !!places
+    });
+
     // Check if exact same search exists within last 5 minutes (avoid duplicates)
     const recentSearch = await prisma.searchHistory.findFirst({
       where: {
@@ -67,6 +75,7 @@ export async function POST(request: NextRequest) {
 
       // Add new places
       if (places && places.length > 0) {
+        console.log('📍 UPDATING PLACES FOR EXISTING SEARCH:', places.length);
         await prisma.searchPlace.createMany({
           data: places.map((place: any) => ({
             searchHistoryId: recentSearch.id,
@@ -93,10 +102,12 @@ export async function POST(request: NextRequest) {
         include: { places: true }
       });
 
+      console.log('✅ UPDATED EXISTING SEARCH WITH PLACES:', updatedSearch.places.length);
       return NextResponse.json({ searchHistory: updatedSearch });
     }
 
     // Create new search history record with places
+    console.log('📍 CREATING NEW SEARCH WITH PLACES:', places?.length || 0);
     const searchHistory = await prisma.searchHistory.create({
       data: {
         userId: decoded.userId,
@@ -123,9 +134,10 @@ export async function POST(request: NextRequest) {
       include: { places: true }
     });
 
+    console.log('✅ CREATED NEW SEARCH HISTORY WITH PLACES:', searchHistory.places.length);
     return NextResponse.json({ searchHistory });
   } catch (error) {
-    console.error('Error saving search history:', error);
+    console.error('❌ ERROR SAVING SEARCH HISTORY:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

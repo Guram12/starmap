@@ -31,6 +31,7 @@ interface SearchParams {
   minStars: number;
   searchRadius: number;
   resultsCount: number;
+  places?: any[]; // Add places parameter
 }
 
 export function useSearchHistory() {
@@ -68,6 +69,12 @@ export function useSearchHistory() {
 
   // Save search to history
   const saveSearchToHistory = useCallback(async (searchParams: SearchParams) => {
+    console.log('💾 HOOK: Saving search to history:', {
+      region: searchParams.region,
+      placesCount: searchParams.places?.length || 0,
+      hasPlaces: !!searchParams.places
+    });
+
     try {
       const response = await fetch('/api/search-history', {
         method: 'POST',
@@ -78,11 +85,14 @@ export function useSearchHistory() {
       });
 
       if (response.ok) {
+        console.log('✅ HOOK: Search saved successfully');
         // Refresh history after saving
         await fetchSearchHistory();
+      } else {
+        console.error('❌ HOOK: Failed to save search');
       }
     } catch (err) {
-      console.error('Error saving search to history:', err);
+      console.error('❌ HOOK: Error saving search to history:', err);
     }
   }, [fetchSearchHistory]);
 

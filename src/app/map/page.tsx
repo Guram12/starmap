@@ -102,13 +102,27 @@ export default function MapPage() {
   // Save to history only for fresh searches, not when loading from history
   useEffect(() => {
     if (isAuthenticated && places.length > 0 && preferences.region && !isFromHistory) {
-      console.log('💾 MAP PAGE: Saving fresh search to history');
+      console.log('💾 MAP PAGE: Saving fresh search to history with places');
       saveSearchToHistory({
         region: preferences.region,
         placeType: preferences.placeType,
         minStars: preferences.minStars,
         searchRadius: preferences.searchRadius,
         resultsCount: places.length,
+        places: places.map(place => ({
+          id: place.id,
+          displayName: place.displayName,
+          rating: place.rating,
+          formattedAddress: place.formattedAddress,
+          location: {
+            lat: place.location.lat(),
+            lng: place.location.lng()
+          },
+          types: place.types,
+          priceLevel: place.priceLevel,
+          websiteURI: place.websiteURI,
+          nationalPhoneNumber: place.nationalPhoneNumber,
+        }))
       });
     } else if (isFromHistory) {
       console.log('📂 MAP PAGE: Skipping history save - results are from history');

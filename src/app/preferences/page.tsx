@@ -148,6 +148,12 @@ export default function Preferences() {
   }, [places, region, placeType, minStars, searchRadius, isAuthenticated]);
 
   const saveSearchWithPlacesToDatabase = async () => {
+    console.log('💾 PREFERENCES: Saving search with places to database:', {
+      placesCount: places.length,
+      region,
+      placeType
+    });
+
     try {
       const response = await fetch('/api/search-history', {
         method: 'POST',
@@ -178,10 +184,13 @@ export default function Preferences() {
       });
 
       if (response.ok) {
-        console.log('✅ PREFERENCES: Search results saved to database');
+        const result = await response.json();
+        console.log('✅ PREFERENCES: Search results saved to database with places:', result.searchHistory?.places?.length || 0);
+      } else {
+        console.error('❌ PREFERENCES: Failed to save to database');
       }
     } catch (error) {
-      console.error('Error saving search to database:', error);
+      console.error('❌ PREFERENCES: Error saving search to database:', error);
     }
   };
 
