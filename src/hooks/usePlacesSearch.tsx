@@ -72,7 +72,7 @@ export function usePlacesSearch() {
 
       try {
         const service = new google.maps.places.PlacesService(map);
-        
+
         // Use a fixed smaller radius to reduce costs
         const optimizedRadius = Math.min(params.radius, 10); // Max 10km for all searches
 
@@ -137,9 +137,23 @@ export function usePlacesSearch() {
     }, DEBOUNCE_DELAY);
 
   }, []);
-
   const geocodeLocation = useCallback(async (locationName: string): Promise<google.maps.LatLng | null> => {
-    // Check cache first
+    // Check if input is already coordinates (lat, lng format)
+    const coordPattern = /^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/;
+    const coordMatch = locationName.trim().match(coordPattern);
+
+    if (coordMatch) {
+      const lat = parseFloat(coordMatch[1]);
+      const lng = parseFloat(coordMatch[2]);
+
+      // Validate coordinate ranges
+      if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        console.log('Using direct coordinates:', lat, lng);
+        return new google.maps.LatLng(lat, lng);
+      }
+    }
+
+    // Check cache first for text-based locations
     const normalizedName = locationName.toLowerCase().trim();
     const cached = geocodingCache.current.get(normalizedName);
 
@@ -148,6 +162,7 @@ export function usePlacesSearch() {
       return cached.location;
     }
 
+    // Use geocoding service for city/address names
     return new Promise((resolve) => {
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address: locationName }, (results, status) => {

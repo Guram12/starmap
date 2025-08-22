@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import styles from './Preferences.module.css';  // ✅ Correct
-// Define the place type options
+import styles from './Preferences.module.css';
+
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
 
 export default function Preferences() {
@@ -12,6 +12,7 @@ export default function Preferences() {
   const [minStars, setMinStars] = useState(3);
   const [searchRadius, setSearchRadius] = useState(5);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   // Load preferences from localStorage on component mount
   useEffect(() => {
@@ -24,6 +25,53 @@ export default function Preferences() {
       setSearchRadius(prefs.searchRadius || 5);
     }
   }, []);
+  const getCurrentLocation = () => {
+    setLocationLoading(true);
+
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      setLocationLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Set coordinates directly in the format "lat,lng"
+        setRegion(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        let errorMessage = 'Unable to get location. ';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Location access denied by user.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Location request timed out.';
+            break;
+          default:
+            errorMessage += 'An unknown error occurred.';
+            break;
+        }
+
+        alert(errorMessage);
+        setLocationLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
+  };
+
 
   const savePreferences = () => {
     const preferences = {
@@ -33,10 +81,10 @@ export default function Preferences() {
       searchRadius,
       timestamp: new Date().toISOString()
     };
-    
+
     localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
     setShowSuccess(true);
-    
+
     // Hide success message after 3 seconds
     setTimeout(() => {
       setShowSuccess(false);
@@ -65,21 +113,42 @@ export default function Preferences() {
             Customize your search criteria to find the perfect places
           </p>
         </div>
-        
+
         <form className={styles.form} onSubmit={(e) => { e.preventDefault(); savePreferences(); }}>
           <div className={styles.field}>
             <label htmlFor="region" className={styles.label}>
               📍 Region
             </label>
-            <input
-              id="region"
-              type="text"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              placeholder="Enter city or area name (e.g., New York, Paris)"
-              className={styles.input}
-              required
-            />
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input
+                id="region"
+                type="text"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="Enter city or area name (e.g., New York, Paris)"
+                className={styles.input}
+                style={{ flex: 1 }}
+                required
+              />
+              <button
+                type="button"
+                onClick={getCurrentLocation}
+                disabled={locationLoading}
+                className={`${styles.actionBtn}`}
+                style={{
+                  minWidth: '120px',
+                  fontSize: '12px',
+                  padding: '8px 12px',
+                  backgroundColor: locationLoading ? '#9ca3af' : '#059669',
+                  cursor: locationLoading ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {locationLoading ? '🔄 Getting...' : '📍 Use Current'}
+              </button>
+            </div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+              💡 You can type a location or use your current position
+            </div>
           </div>
 
           <div className={styles.field}>
@@ -146,7 +215,7 @@ export default function Preferences() {
                 className={styles.rangeInput}
               />
               <div style={{ fontSize: '12px', color: '#f59e0b', marginTop: '4px', fontWeight: '500' }}>
-                ⚠️ In large cities, only the 15 nearest best and nearest places will be shown
+                ⚠️ Maximum 15 places shown to reduce API costs
               </div>
             </div>
           </div>
@@ -170,6 +239,3 @@ export default function Preferences() {
     </div>
   );
 }
-
-
-
