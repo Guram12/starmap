@@ -2,12 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
-import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import styles from './Map.module.css';
 import { MapPinned } from 'lucide-react';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useAuth } from '../AuthProvider';
 
+
+interface Place {
+  id: string;
+  displayName: string;
+  rating?: number | null;
+  formattedAddress?: string | null;
+  location: google.maps.LatLng;
+  photos?: google.maps.places.PlacePhoto[];
+  types?: string[];
+  priceLevel?: google.maps.places.PriceLevel | null;
+  websiteURI?: string | null;
+  nationalPhoneNumber?: string | null;
+}
 
 interface Preferences {
   region: string;
@@ -23,27 +35,19 @@ export default function MapPage() {
     minStars: 3,
     searchRadius: 5
   });
+  const [places, setPlaces] = useState<Place[]>([]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
-  const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [isFromHistory, setIsFromHistory] = useState(false);
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
-
-  const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
-
   const { saveSearchToHistory } = useSearchHistory();
   const { isAuthenticated } = useAuth();
 
 
-
-
-  //=====================================    Load places when map and preferences are ready     ====================================
+  //=====================================    Load preferences and search results from localStorage     ====================================
   useEffect(() => {
-    console.log('Places updated:', places);
-  }, [places]);
-
-
-  //=====================================    Load preferences from localStorage     ==================================== 
-  useEffect(() => {
+    // Load preferences
     const savedPrefs = localStorage.getItem('starmap-preferences');
     if (savedPrefs) {
       const prefs = JSON.parse(savedPrefs);
@@ -54,49 +58,86 @@ export default function MapPage() {
         searchRadius: prefs.searchRadius || 5
       });
     }
+
     setPrefsLoaded(true);
   }, []);
 
-  //============================ Search for places when map loads and preferences are available  =======================
+  // Separate effect for loading search results after Google Maps is loaded
   useEffect(() => {
-    const performSearch = async () => {
-      if (!map || !preferences.region || !isLoaded) return;
+    if (!isLoaded || !window.google) return;
 
-      try {
-        const location = await geocodeLocation(preferences.region);
-        if (location) {
-          map.setCenter(location);
-          map.setZoom(12);
-
-          await searchPlaces(map, {
-            location,
-            radius: preferences.searchRadius,
-            type: preferences.placeType,
-            minRating: preferences.minStars
-          }, preferences.region); // Pass the region name
-        }
-      } catch (error) {
-        console.error('Search failed:', error);
-      }
-    };
-
-    if (prefsLoaded && preferences.region) {
-      performSearch();
+    // Load search results only after Google Maps is loaded
+    const savedResults = localStorage.getItem('starmap-search-results');
+    if (savedResults) {
+      const results = JSON.parse(savedResults);
+      setIsFromHistory(!!results.fromHistory);
+      
+      // Convert plain objects back to LatLng objects - now safe to use
+      const placesWithLatLng = results.places.map((place: {
+        id: string;
+        displayName: string;
+        rating?: number | null;
+        formattedAddress?: string | null;
+        location: { lat: number; lng: number };
+        types?: string[];
+        priceLevel?: number | null;
+        websiteURI?: string | null;
+        nationalPhoneNumber?: string | null;
+      }) => ({
+        ...place,
+        location: new google.maps.LatLng(place.location.lat, place.location.lng)
+      }));
+      setPlaces(placesWithLatLng);
+      console.log('✅ MAP PAGE: Loaded search results from localStorage:', {
+        count: placesWithLatLng.length,
+        fromHistory: !!results.fromHistory,
+        timestamp: results.timestamp
+      });
     }
-  }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation]);
+  }, [isLoaded]); // Only run when Google Maps is loaded
 
-
+  // ============================ Center map when preferences load and places are available  =======================
   useEffect(() => {
-    if (isAuthenticated && places.length > 0 && preferences.region) {
+    if (map && isLoaded && preferences.region && places.length > 0) {
+      // Center map on first place or use geocoding for region
+      const firstPlace = places[0];
+      if (firstPlace && firstPlace.location) {
+        map.setCenter(firstPlace.location);
+        map.setZoom(12);
+        console.log('✅ MAP PAGE: Map centered on search results');
+      }
+    }
+  }, [map, isLoaded, preferences.region, places]);
+
+  // Save to history only for fresh searches, not when loading from history
+  useEffect(() => {
+    if (isAuthenticated && places.length > 0 && preferences.region && !isFromHistory) {
+      console.log('💾 MAP PAGE: Saving fresh search to history with places');
       saveSearchToHistory({
         region: preferences.region,
         placeType: preferences.placeType,
         minStars: preferences.minStars,
         searchRadius: preferences.searchRadius,
         resultsCount: places.length,
+        places: places.map(place => ({
+          id: place.id,
+          displayName: place.displayName,
+          rating: place.rating ?? null,
+          formattedAddress: place.formattedAddress ?? null,
+          location: {
+            lat: place.location.lat(),
+            lng: place.location.lng()
+          },
+          types: place.types,
+          priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
+          websiteURI: place.websiteURI ?? null,
+          nationalPhoneNumber: place.nationalPhoneNumber ?? null,
+        }))
       });
+    } else if (isFromHistory) {
+      console.log('📂 MAP PAGE: Skipping history save - results are from history');
     }
-  }, [places, preferences, isAuthenticated, saveSearchToHistory]);
+  }, [places, preferences, isAuthenticated, saveSearchToHistory, isFromHistory]);
 
 
   // =========================================  Update markers when places change  =============================================
@@ -104,31 +145,26 @@ export default function MapPage() {
     if (!map || !places.length) return;
 
     // Clear existing markers
-    markers.forEach(marker => marker.map = null);
+    markers.forEach(marker => marker.setMap(null));
 
-    // Create new markers using Advanced Markers (new API)
+    // Create new markers using legacy Marker API (cheaper)
     const newMarkers = places.map(place => {
-      // Create marker element
-      const markerElement = document.createElement('div');
-      markerElement.innerHTML = getMarkerIcon(preferences.placeType);
-      markerElement.style.width = '32px';
-      markerElement.style.height = '32px';
-      markerElement.style.borderRadius = '50%';
-      markerElement.style.display = 'flex';
-      markerElement.style.alignItems = 'center';
-      markerElement.style.justifyContent = 'center';
-      markerElement.style.backgroundColor = '#ffffff';
-      markerElement.style.border = '2px solid #1f2937';
-      markerElement.style.cursor = 'pointer';
-
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+      const marker = new google.maps.Marker({
         map,
         position: place.location,
-        content: markerElement,
         title: place.displayName,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="#1f2937"/>
+              <text x="12" y="16" text-anchor="middle" fill="white" font-size="12">${getMarkerIcon(preferences.placeType)}</text>
+            </svg>`
+          )}`,
+          scaledSize: new google.maps.Size(32, 32),
+        }
       });
 
-      // Add info window
+      // Add info window with minimal content
       const infoWindow = new google.maps.InfoWindow({
         content: createInfoWindowContent(place)
       });
@@ -141,7 +177,7 @@ export default function MapPage() {
     });
 
     setMarkers(newMarkers);
-  }, [map, places, preferences.placeType]);
+  }, [map, places, preferences.placeType, markers]);
 
 
   // ==============================================    set marker icon   ==================================================
@@ -162,29 +198,18 @@ export default function MapPage() {
 
   const createInfoWindowContent = (place: {
     displayName: string;
-    photos?: google.maps.places.Photo[];
-    priceLevel?: google.maps.places.PriceLevel | null;
     rating?: number | null;
     formattedAddress?: string | null;
-    websiteURI?: string | null;
   }): string => {
-    const photoUrl = place.photos && place.photos.length > 0
-      ? place.photos[0].getURI({ maxWidth: 200, maxHeight: 150 })
-      : '';
-
-    const priceLevel = place.priceLevel ? '$'.repeat(Number(place.priceLevel)) : '';
-
+    // Simplified info window - no photos or expensive data
     return `
-      <div style="max-width: 250px; padding: 10px;">
-        ${photoUrl ? `<img src="${photoUrl}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />` : ''}
-        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #1f2937;">${place.displayName}</h3>
+      <div style="max-width: 200px; padding: 8px;">
+        <h3 style="margin: 0 0 4px 0; font-size: 14px; color: #1f2937;">${place.displayName}</h3>
         <div style="display: flex; align-items: center; margin-bottom: 4px;">
           <span style="color: #fbbf24; margin-right: 4px;">⭐</span>
           <span style="font-weight: 600; color: #374151;">${place.rating || 'N/A'}</span>
         </div>
-        <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">${place.formattedAddress || 'Address not available'}</p>
-        ${priceLevel ? `<p style="margin: 4px 0; color: #10b981; font-size: 14px;">Price: ${priceLevel}</p>` : ''}
-        ${place.websiteURI ? `<a href="${place.websiteURI}" target="_blank" style="color: #3b82f6; font-size: 14px;">Visit Website</a>` : ''}
+        <p style="margin: 0; color: #6b7280; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
       </div>
     `;
   };
@@ -210,6 +235,22 @@ export default function MapPage() {
             {/* Your existing sidebar content */}
             <div className={styles.settingsCard}>
               <h3 className={styles.cardTitle}>⚙️ Current Settings</h3>
+              
+              {isFromHistory && (
+                <div style={{ 
+                  padding: '8px 12px', 
+                  backgroundColor: '#dbeafe', 
+                  border: '1px solid #3b82f6', 
+                  borderRadius: '6px', 
+                  color: '#1e40af',
+                  fontSize: '12px',
+                  marginBottom: '12px',
+                  fontWeight: '500'
+                }}>
+                  📂 Showing results from search history
+                </div>
+              )}
+
               <div className={styles.settingItem}>
                 <span className={styles.settingLabel}>📍 Region:</span>
                 <span className={styles.settingValue}>{preferences.region || 'Not set'}</span>
@@ -227,13 +268,27 @@ export default function MapPage() {
                 <span className={styles.settingValue}>{preferences.searchRadius} km</span>
               </div>
 
+              {!places.length && preferences.region && !isFromHistory && (
+                <div style={{ 
+                  padding: '12px', 
+                  backgroundColor: '#fef3c7', 
+                  border: '1px solid #f59e0b', 
+                  borderRadius: '8px', 
+                  color: '#92400e',
+                  fontSize: '14px',
+                  marginTop: '12px'
+                }}>
+                  💡 No search results found. Go to Preferences to search for places.
+                </div>
+              )}
             </div>
 
             <div >
-              <h3 className={styles.result_cardTitle}>📍 Results ({places.length})</h3>
+              <h3 className={styles.result_cardTitle}>
+                📍 Results ({places.length})
+                {isFromHistory && <span style={{fontSize: '12px', color: '#6b7280'}}> from history</span>}
+              </h3>
 
-              {loading && <p>Searching places...</p>}
-              {searchError && <p style={{ color: 'red' }}>{searchError}</p>}
               {places.length > 0 && (
                 <div className={styles.placesList}>
                   {places.map((place) => (
@@ -255,7 +310,7 @@ export default function MapPage() {
                 <MapPinned className={styles.mapIcon} /> Interactive Map
               </h3>
               <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-                {preferences.region ? `Searching in ${preferences.region}` : 'Set region to search'}
+                {preferences.region ? `Showing results for ${preferences.region}` : 'Set region in preferences'}
               </span>
             </div>
 

@@ -6,16 +6,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './History.module.css';
 
-interface SearchHistoryItem {
-  id: number;
-  region: string;
-  placeType: string;
-  minStars: number;
-  searchRadius: number;
-  resultsCount: number;
-  searchedAt: string;
-}
-
 export default function HistoryPage() {
   const { isAuthenticated } = useAuth();
   const { searchHistory, loading, clearSearchHistory } = useSearchHistory();
@@ -45,8 +35,10 @@ export default function HistoryPage() {
     return icons[placeType] || '📍';
   };
 
-  const handleSelectSearch = (search: SearchHistoryItem) => {
-    // Save selected search to preferences
+  const handleSelectSearch = (search: typeof searchHistory[0]) => {
+    console.log('🔄 HISTORY: Selecting search:', search);
+
+    // Save selected search preferences
     const preferences = {
       region: search.region,
       placeType: search.placeType,
@@ -54,11 +46,51 @@ export default function HistoryPage() {
       searchRadius: search.searchRadius,
       timestamp: new Date().toISOString()
     };
-    
+
     localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
-    
-    // Navigate to map page
-    router.push('/map');
+    console.log('✅ HISTORY: Preferences saved to localStorage');
+
+    // Convert database places back to the format expected by map
+    const placesForMap = search.places.map(place => ({
+      id: place.placeId,
+      displayName: place.displayName,
+      rating: place.rating,
+      formattedAddress: place.formattedAddress,
+      location: {
+        lat: place.latitude,
+        lng: place.longitude
+      },
+      types: place.types ? JSON.parse(place.types) : undefined,
+      priceLevel: place.priceLevel,
+      websiteURI: place.websiteURI,
+      nationalPhoneNumber: place.phoneNumber,
+    }));
+
+    // Save search results from history
+    const searchResults = {
+      places: placesForMap,
+      searchParams: {
+        region: search.region,
+        placeType: search.placeType,
+        minStars: search.minStars,
+        searchRadius: search.searchRadius
+      },
+      timestamp: search.searchedAt,
+      fromHistory: true // This is crucial - marks it as from history
+    };
+
+    localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+    console.log('✅ HISTORY: Search results saved to localStorage:', {
+      places: placesForMap.length,
+      fromHistory: true
+    });
+
+    // Clear any existing results first to force refresh
+    localStorage.removeItem('starmap-search-results');
+    setTimeout(() => {
+      localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+      router.push('/map');
+    }, 50);
   };
 
   const handleClearHistory = async () => {
@@ -72,6 +104,37 @@ export default function HistoryPage() {
   const uniqueRegions = new Set(searchHistory.map(item => item.region)).size;
   const totalResults = searchHistory.reduce((sum, item) => sum + item.resultsCount, 0);
   const averageResults = totalSearches > 0 ? Math.round(totalResults / totalSearches) : 0;
+
+
+
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.historyPage}>
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>
+              📊 Search History
+            </h1>
+            <p className={styles.subtitle}>
+              View and revisit your previous searches
+            </p>
+          </div>
+
+          <div className={styles.searchHistory}>
+            <div className={styles.notLoggedIn}>
+              <div className={styles.authIcon}>🔐</div>
+              <h3>Authentication Required</h3>
+              <p>Please log in or register to view your search history</p>
+              <Link href="/auth" className={styles.authLink}>
+                Go to Login / Register
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className={styles.historyPage}>
@@ -96,7 +159,7 @@ export default function HistoryPage() {
             🏠 Home
           </Link>
           {searchHistory.length > 0 && (
-            <button 
+            <button
               onClick={handleClearHistory}
               className={`${styles.actionBtn} ${styles.clearBtn}`}
             >
@@ -142,12 +205,12 @@ export default function HistoryPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className={styles.historyHeader}>
                   <h3 className={styles.historyTitle}>
                     🕒 Recent Searches
                   </h3>
-                  <button 
+                  <button
                     onClick={handleClearHistory}
                     className={styles.clearHistoryBtn}
                     title="Clear all history"
@@ -166,8 +229,8 @@ export default function HistoryPage() {
             ) : (
               <div className={styles.historyList}>
                 {searchHistory.map((item) => (
-                  <div 
-                    key={item.id} 
+                  <div
+                    key={item.id}
                     className={styles.historyItem}
                     onClick={() => handleSelectSearch(item)}
                     title="Click to use these settings and go to map"
