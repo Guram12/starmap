@@ -33,9 +33,10 @@ export function usePlacesSearch() {
   const lastSearchRef = useRef<string>('');
   const geocodingCache = useRef(new Map<string, { location: google.maps.LatLng, timestamp: number }>());
 
-  const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-  const DEBOUNCE_DELAY = 1000; // 1 second
-  const MAX_RESULTS = 15; // Fixed limit for all searches
+  // Move constants outside of useCallback to avoid dependency issues
+  const CACHE_DURATION = useRef(10 * 60 * 1000); // 10 minutes
+  const DEBOUNCE_DELAY = useRef(1000); // 1 second
+  const MAX_RESULTS = useRef(15); // Fixed limit for all searches
 
 
   // Suppress Google Maps deprecation warnings for cost optimization
@@ -79,7 +80,7 @@ export function usePlacesSearch() {
 
     // Check cache first
     const cached = cache.current.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION.current) {
       console.log('✅ USING CACHED RESULTS - NO API CALL');
       setPlaces(cached.data);
       return;
@@ -124,12 +125,12 @@ export function usePlacesSearch() {
         };
 
         console.log(`Searching with radius: ${optimizedRadius}km for location: ${locationName || 'Unknown'}`);
-        console.log(`Limited to ${MAX_RESULTS} results to reduce API costs`);
+        console.log(`Limited to ${MAX_RESULTS.current} results to reduce API costs`);
 
         const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
           service.nearbySearch(request, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-              resolve(results.slice(0, MAX_RESULTS)); // Always limit to 15 results
+              resolve(results.slice(0, MAX_RESULTS.current)); // Always limit to 15 results
             } else {
               reject(new Error(`Search failed: ${status}`));
             }
@@ -175,18 +176,9 @@ export function usePlacesSearch() {
         setLoading(false);
         lastSearchRef.current = '';
       }
-    }, DEBOUNCE_DELAY);
+    }, DEBOUNCE_DELAY.current);
 
-  }, []);
-
-
-
-
-
-
-
-
-
+  }, []); // Remove dependencies since we're using refs
 
   const geocodeLocation = useCallback(async (locationName: string): Promise<google.maps.LatLng | null> => {
     console.log('🗺️ GEOCODING REQUEST:', { locationName, timestamp: new Date().toISOString() });
@@ -209,7 +201,7 @@ export function usePlacesSearch() {
     const normalizedName = locationName.toLowerCase().trim();
     const cached = geocodingCache.current.get(normalizedName);
 
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION.current) {
       console.log('✅ USING CACHED GEOCODING - NO API CALL');
       return cached.location;
     }
@@ -243,7 +235,7 @@ export function usePlacesSearch() {
         }
       });
     });
-  }, []);
+  }, []); // Remove dependencies since we're using refs
 
   return { places, loading, error, searchPlaces, geocodeLocation };
 }

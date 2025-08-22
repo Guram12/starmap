@@ -73,7 +73,17 @@ export default function MapPage() {
       setIsFromHistory(!!results.fromHistory);
       
       // Convert plain objects back to LatLng objects - now safe to use
-      const placesWithLatLng = results.places.map((place: any) => ({
+      const placesWithLatLng = results.places.map((place: {
+        id: string;
+        displayName: string;
+        rating?: number | null;
+        formattedAddress?: string | null;
+        location: { lat: number; lng: number };
+        types?: string[];
+        priceLevel?: number | null;
+        websiteURI?: string | null;
+        nationalPhoneNumber?: string | null;
+      }) => ({
         ...place,
         location: new google.maps.LatLng(place.location.lat, place.location.lng)
       }));
@@ -86,7 +96,7 @@ export default function MapPage() {
     }
   }, [isLoaded]); // Only run when Google Maps is loaded
 
-  //============================ Center map when preferences load and places are available  =======================
+  // ============================ Center map when preferences load and places are available  =======================
   useEffect(() => {
     if (map && isLoaded && preferences.region && places.length > 0) {
       // Center map on first place or use geocoding for region
@@ -112,16 +122,16 @@ export default function MapPage() {
         places: places.map(place => ({
           id: place.id,
           displayName: place.displayName,
-          rating: place.rating,
-          formattedAddress: place.formattedAddress,
+          rating: place.rating ?? null,
+          formattedAddress: place.formattedAddress ?? null,
           location: {
             lat: place.location.lat(),
             lng: place.location.lng()
           },
           types: place.types,
-          priceLevel: place.priceLevel,
-          websiteURI: place.websiteURI,
-          nationalPhoneNumber: place.nationalPhoneNumber,
+          priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
+          websiteURI: place.websiteURI ?? null,
+          nationalPhoneNumber: place.nationalPhoneNumber ?? null,
         }))
       });
     } else if (isFromHistory) {
@@ -167,7 +177,7 @@ export default function MapPage() {
     });
 
     setMarkers(newMarkers);
-  }, [map, places, preferences.placeType]);
+  }, [map, places, preferences.placeType, markers]);
 
 
   // ==============================================    set marker icon   ==================================================

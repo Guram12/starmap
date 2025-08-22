@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
@@ -18,7 +18,7 @@ export default function Preferences() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const { mapRef, map, isLoaded } = useGoogleMap();
-  const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
+  const { places, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch(); // Remove unused 'loading'
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -128,26 +128,7 @@ export default function Preferences() {
     }
   };
 
-  // Store search results when places update
-  useEffect(() => {
-    if (places && places.length > 0) {
-      const searchResults = {
-        places,
-        searchParams: { region, placeType, minStars, searchRadius },
-        timestamp: new Date().toISOString(),
-        fromHistory: false // Mark as fresh search
-      };
-      localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
-      console.log('✅ PREFERENCES: Search results stored in localStorage');
-
-      // Also save to database if authenticated
-      if (isAuthenticated) {
-        saveSearchWithPlacesToDatabase();
-      }
-    }
-  }, [places, region, placeType, minStars, searchRadius, isAuthenticated]);
-
-  const saveSearchWithPlacesToDatabase = async () => {
+  const saveSearchWithPlacesToDatabase = useCallback(async () => {
     console.log('💾 PREFERENCES: Saving search with places to database:', {
       placesCount: places.length,
       region,
@@ -169,16 +150,16 @@ export default function Preferences() {
           places: places.map(place => ({
             id: place.id,
             displayName: place.displayName,
-            rating: place.rating,
-            formattedAddress: place.formattedAddress,
+            rating: place.rating ?? null,
+            formattedAddress: place.formattedAddress ?? null,
             location: {
               lat: place.location.lat(),
               lng: place.location.lng()
             },
             types: place.types,
-            priceLevel: place.priceLevel,
-            websiteURI: place.websiteURI,
-            nationalPhoneNumber: place.nationalPhoneNumber,
+            priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
+            websiteURI: place.websiteURI ?? null,
+            nationalPhoneNumber: place.nationalPhoneNumber ?? null,
           }))
         }),
       });
@@ -192,7 +173,26 @@ export default function Preferences() {
     } catch (error) {
       console.error('❌ PREFERENCES: Error saving search to database:', error);
     }
-  };
+  }, [places, region, placeType, minStars, searchRadius]);
+
+  // Store search results when places update
+  useEffect(() => {
+    if (places && places.length > 0) {
+      const searchResults = {
+        places,
+        searchParams: { region, placeType, minStars, searchRadius },
+        timestamp: new Date().toISOString(),
+        fromHistory: false // Mark as fresh search
+      };
+      localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+      console.log('✅ PREFERENCES: Search results stored in localStorage');
+
+      // Also save to database if authenticated
+      if (isAuthenticated) {
+        saveSearchWithPlacesToDatabase();
+      }
+    }
+  }, [places, region, placeType, minStars, searchRadius, isAuthenticated, saveSearchWithPlacesToDatabase]);
 
   const getPlaceTypeIcon = (type: PlaceType): string => {
     const icons: Record<PlaceType, string> = {

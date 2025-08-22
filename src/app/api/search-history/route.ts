@@ -4,6 +4,21 @@ import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
+interface PlaceData {
+  id: string;
+  displayName: string;
+  rating: number | null | undefined;
+  formattedAddress: string | null | undefined;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  types?: string[];
+  priceLevel: number | null | undefined;
+  websiteURI: string | null | undefined;
+  nationalPhoneNumber: string | null | undefined;
+}
+
 // GET - Fetch user's search history with places
 export async function GET(request: NextRequest) {
   try {
@@ -77,18 +92,18 @@ export async function POST(request: NextRequest) {
       if (places && places.length > 0) {
         console.log('📍 UPDATING PLACES FOR EXISTING SEARCH:', places.length);
         await prisma.searchPlace.createMany({
-          data: places.map((place: any) => ({
+          data: (places as PlaceData[]).map((place: PlaceData) => ({
             searchHistoryId: recentSearch.id,
             placeId: place.id,
             displayName: place.displayName,
-            rating: place.rating,
-            formattedAddress: place.formattedAddress,
+            rating: place.rating ?? null,
+            formattedAddress: place.formattedAddress ?? null,
             latitude: place.location.lat,
             longitude: place.location.lng,
             types: place.types ? JSON.stringify(place.types) : null,
-            priceLevel: place.priceLevel,
-            websiteURI: place.websiteURI,
-            phoneNumber: place.nationalPhoneNumber,
+            priceLevel: place.priceLevel ?? null,
+            websiteURI: place.websiteURI ?? null,
+            phoneNumber: place.nationalPhoneNumber ?? null,
           }))
         });
       }
@@ -117,17 +132,17 @@ export async function POST(request: NextRequest) {
         searchRadius,
         resultsCount,
         places: {
-          create: places ? places.map((place: any) => ({
+          create: places ? (places as PlaceData[]).map((place: PlaceData) => ({
             placeId: place.id,
             displayName: place.displayName,
-            rating: place.rating,
-            formattedAddress: place.formattedAddress,
+            rating: place.rating ?? null,
+            formattedAddress: place.formattedAddress ?? null,
             latitude: place.location.lat,
             longitude: place.location.lng,
             types: place.types ? JSON.stringify(place.types) : null,
-            priceLevel: place.priceLevel,
-            websiteURI: place.websiteURI,
-            phoneNumber: place.nationalPhoneNumber,
+            priceLevel: place.priceLevel ?? null,
+            websiteURI: place.websiteURI ?? null,
+            phoneNumber: place.nationalPhoneNumber ?? null,
           })) : []
         }
       },

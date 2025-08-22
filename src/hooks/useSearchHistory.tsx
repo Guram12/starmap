@@ -25,13 +25,28 @@ interface SearchHistoryItem {
   places: SearchPlace[];
 }
 
+interface PlaceData {
+  id: string;
+  displayName: string;
+  rating: number | null | undefined;
+  formattedAddress: string | null | undefined;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  types?: string[];
+  priceLevel: number | null | undefined;
+  websiteURI: string | null | undefined;
+  nationalPhoneNumber: string | null | undefined;
+}
+
 interface SearchParams {
   region: string;
   placeType: string;
   minStars: number;
   searchRadius: number;
   resultsCount: number;
-  places?: any[]; // Add places parameter
+  places?: PlaceData[]; // Replace any[] with PlaceData[]
 }
 
 export function useSearchHistory() {
@@ -46,7 +61,7 @@ export function useSearchHistory() {
 
     try {
       const response = await fetch('/api/search-history');
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           // User not authenticated, return empty array
