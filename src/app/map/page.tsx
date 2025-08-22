@@ -38,6 +38,7 @@ export default function MapPage() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [isFromHistory, setIsFromHistory] = useState(false);
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
   const { saveSearchToHistory } = useSearchHistory();
@@ -58,21 +59,32 @@ export default function MapPage() {
       });
     }
 
-    // Load search results
+    setPrefsLoaded(true);
+  }, []);
+
+  // Separate effect for loading search results after Google Maps is loaded
+  useEffect(() => {
+    if (!isLoaded || !window.google) return;
+
+    // Load search results only after Google Maps is loaded
     const savedResults = localStorage.getItem('starmap-search-results');
     if (savedResults) {
       const results = JSON.parse(savedResults);
-      // Convert plain objects back to LatLng objects
+      setIsFromHistory(!!results.fromHistory);
+      
+      // Convert plain objects back to LatLng objects - now safe to use
       const placesWithLatLng = results.places.map((place: any) => ({
         ...place,
         location: new google.maps.LatLng(place.location.lat, place.location.lng)
       }));
       setPlaces(placesWithLatLng);
-      console.log('✅ MAP PAGE: Loaded search results from localStorage:', placesWithLatLng.length, 'places');
+      console.log('✅ MAP PAGE: Loaded search results from localStorage:', {
+        count: placesWithLatLng.length,
+        fromHistory: !!results.fromHistory,
+        timestamp: results.timestamp
+      });
     }
-
-    setPrefsLoaded(true);
-  }, []);
+  }, [isLoaded]); // Only run when Google Maps is loaded
 
   //============================ Center map when preferences load and places are available  =======================
   useEffect(() => {
@@ -87,8 +99,10 @@ export default function MapPage() {
     }
   }, [map, isLoaded, preferences.region, places]);
 
+  // Save to history only for fresh searches, not when loading from history
   useEffect(() => {
-    if (isAuthenticated && places.length > 0 && preferences.region) {
+    if (isAuthenticated && places.length > 0 && preferences.region && !isFromHistory) {
+      console.log('💾 MAP PAGE: Saving fresh search to history');
       saveSearchToHistory({
         region: preferences.region,
         placeType: preferences.placeType,
@@ -96,8 +110,10 @@ export default function MapPage() {
         searchRadius: preferences.searchRadius,
         resultsCount: places.length,
       });
+    } else if (isFromHistory) {
+      console.log('📂 MAP PAGE: Skipping history save - results are from history');
     }
-  }, [places, preferences, isAuthenticated, saveSearchToHistory]);
+  }, [places, preferences, isAuthenticated, saveSearchToHistory, isFromHistory]);
 
 
   // =========================================  Update markers when places change  =============================================
@@ -195,6 +211,22 @@ export default function MapPage() {
             {/* Your existing sidebar content */}
             <div className={styles.settingsCard}>
               <h3 className={styles.cardTitle}>⚙️ Current Settings</h3>
+              
+              {isFromHistory && (
+                <div style={{ 
+                  padding: '8px 12px', 
+                  backgroundColor: '#dbeafe', 
+                  border: '1px solid #3b82f6', 
+                  borderRadius: '6px', 
+                  color: '#1e40af',
+                  fontSize: '12px',
+                  marginBottom: '12px',
+                  fontWeight: '500'
+                }}>
+                  📂 Showing results from search history
+                </div>
+              )}
+
               <div className={styles.settingItem}>
                 <span className={styles.settingLabel}>📍 Region:</span>
                 <span className={styles.settingValue}>{preferences.region || 'Not set'}</span>
@@ -212,7 +244,7 @@ export default function MapPage() {
                 <span className={styles.settingValue}>{preferences.searchRadius} km</span>
               </div>
 
-              {!places.length && preferences.region && (
+              {!places.length && preferences.region && !isFromHistory && (
                 <div style={{ 
                   padding: '12px', 
                   backgroundColor: '#fef3c7', 
@@ -228,7 +260,10 @@ export default function MapPage() {
             </div>
 
             <div >
-              <h3 className={styles.result_cardTitle}>📍 Results ({places.length})</h3>
+              <h3 className={styles.result_cardTitle}>
+                📍 Results ({places.length})
+                {isFromHistory && <span style={{fontSize: '12px', color: '#6b7280'}}> from history</span>}
+              </h3>
 
               {places.length > 0 && (
                 <div className={styles.placesList}>

@@ -21,7 +21,7 @@ model User {
   @@map("users")
 }
 
-// New SearchHistory model
+// Updated SearchHistory model to include places data
 model SearchHistory {
   id           Int      @id @default(autoincrement())
   userId       Int
@@ -32,10 +32,35 @@ model SearchHistory {
   resultsCount Int      @default(0)
   searchedAt   DateTime @default(now())
 
+  // Add places relation
+  places SearchPlace[]
+
   // Relation to User
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([searchedAt])
   @@map("search_history")
+}
+
+// New model to store individual places from search results
+model SearchPlace {
+  id               Int     @id @default(autoincrement())
+  searchHistoryId  Int
+  placeId          String  // Google Place ID
+  displayName      String
+  rating           Float?
+  formattedAddress String?
+  latitude         Float
+  longitude        Float
+  types            String? // JSON string of place types
+  priceLevel       Int?
+  websiteURI       String?
+  phoneNumber      String?
+
+  // Relation to SearchHistory
+  searchHistory SearchHistory @relation(fields: [searchHistoryId], references: [id], onDelete: Cascade)
+
+  @@index([searchHistoryId])
+  @@map("search_places")
 }

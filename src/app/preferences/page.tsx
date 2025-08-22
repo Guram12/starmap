@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
+import { useAuth } from '../AuthProvider';
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
 
@@ -16,12 +17,10 @@ export default function Preferences() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-
-  // Add map and search hooks
   const { mapRef, map, isLoaded } = useGoogleMap();
   const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
+  const { isAuthenticated } = useAuth();
 
-  // Load preferences from localStorage on component mount
   useEffect(() => {
     const savedPrefs = localStorage.getItem('starmap-preferences');
     if (savedPrefs) {
@@ -32,6 +31,7 @@ export default function Preferences() {
       setSearchRadius(prefs.searchRadius || 5);
     }
   }, []);
+
   const getCurrentLocation = () => {
     setLocationLoading(true);
 
@@ -44,8 +44,6 @@ export default function Preferences() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-
-        // Set coordinates directly in the format "lat,lng"
         setRegion(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
         setLocationLoading(false);
       },
@@ -79,7 +77,6 @@ export default function Preferences() {
     );
   };
 
-
   const savePreferences = async () => {
     if (!region.trim()) {
       alert('Please enter a region before saving.');
@@ -89,7 +86,6 @@ export default function Preferences() {
     setSearchLoading(true);
 
     try {
-      // Save preferences
       const preferences = {
         region,
         placeType,
@@ -100,7 +96,6 @@ export default function Preferences() {
 
       localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
 
-      // Perform search if map is loaded
       if (map && isLoaded) {
         console.log('🔍 PREFERENCES: Starting search with saved preferences');
         
@@ -139,12 +134,56 @@ export default function Preferences() {
       const searchResults = {
         places,
         searchParams: { region, placeType, minStars, searchRadius },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fromHistory: false // Mark as fresh search
       };
       localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
       console.log('✅ PREFERENCES: Search results stored in localStorage');
+
+      // Also save to database if authenticated
+      if (isAuthenticated) {
+        saveSearchWithPlacesToDatabase();
+      }
     }
-  }, [places, region, placeType, minStars, searchRadius]);
+  }, [places, region, placeType, minStars, searchRadius, isAuthenticated]);
+
+  const saveSearchWithPlacesToDatabase = async () => {
+    try {
+      const response = await fetch('/api/search-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          region,
+          placeType,
+          minStars,
+          searchRadius,
+          resultsCount: places.length,
+          places: places.map(place => ({
+            id: place.id,
+            displayName: place.displayName,
+            rating: place.rating,
+            formattedAddress: place.formattedAddress,
+            location: {
+              lat: place.location.lat(),
+              lng: place.location.lng()
+            },
+            types: place.types,
+            priceLevel: place.priceLevel,
+            websiteURI: place.websiteURI,
+            nationalPhoneNumber: place.nationalPhoneNumber,
+          }))
+        }),
+      });
+
+      if (response.ok) {
+        console.log('✅ PREFERENCES: Search results saved to database');
+      }
+    } catch (error) {
+      console.error('Error saving search to database:', error);
+    }
+  };
 
   const getPlaceTypeIcon = (type: PlaceType): string => {
     const icons: Record<PlaceType, string> = {

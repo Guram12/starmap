@@ -18,7 +18,7 @@ export function useGoogleMap(options: MapOptions = {}) {
         const loader = new Loader({
           apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
           version: 'weekly',
-          libraries: ['places', 'geometry'] // Remove 'marker' library - it's expensive
+          libraries: ['places', 'geometry']
         });
 
         const { Map } = await loader.importLibrary('maps') as google.maps.MapsLibrary;
@@ -34,7 +34,12 @@ export function useGoogleMap(options: MapOptions = {}) {
           });
 
           setMap(mapInstance);
+          
+          // Ensure Google Maps is fully loaded before setting isLoaded
+          await new Promise(resolve => setTimeout(resolve, 100));
           setIsLoaded(true);
+          
+          console.log('✅ Google Maps API fully loaded and ready');
         }
       } catch (err) {
         setError('Failed to load Google Maps');

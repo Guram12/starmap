@@ -6,16 +6,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './History.module.css';
 
-interface SearchHistoryItem {
-  id: number;
-  region: string;
-  placeType: string;
-  minStars: number;
-  searchRadius: number;
-  resultsCount: number;
-  searchedAt: string;
-}
-
 export default function HistoryPage() {
   const { isAuthenticated } = useAuth();
   const { searchHistory, loading, clearSearchHistory } = useSearchHistory();
@@ -45,8 +35,10 @@ export default function HistoryPage() {
     return icons[placeType] || '📍';
   };
 
-  const handleSelectSearch = (search: SearchHistoryItem) => {
-    // Save selected search to preferences
+  const handleSelectSearch = (search: typeof searchHistory[0]) => {
+    console.log('🔄 HISTORY: Selecting search:', search);
+    
+    // Save selected search preferences
     const preferences = {
       region: search.region,
       placeType: search.placeType,
@@ -56,9 +48,49 @@ export default function HistoryPage() {
     };
     
     localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
+    console.log('✅ HISTORY: Preferences saved to localStorage');
     
-    // Navigate to map page
-    router.push('/map');
+    // Convert database places back to the format expected by map
+    const placesForMap = search.places.map(place => ({
+      id: place.placeId,
+      displayName: place.displayName,
+      rating: place.rating,
+      formattedAddress: place.formattedAddress,
+      location: {
+        lat: place.latitude,
+        lng: place.longitude
+      },
+      types: place.types ? JSON.parse(place.types) : undefined,
+      priceLevel: place.priceLevel,
+      websiteURI: place.websiteURI,
+      nationalPhoneNumber: place.phoneNumber,
+    }));
+
+    // Save search results from history
+    const searchResults = {
+      places: placesForMap,
+      searchParams: { 
+        region: search.region, 
+        placeType: search.placeType, 
+        minStars: search.minStars, 
+        searchRadius: search.searchRadius 
+      },
+      timestamp: search.searchedAt,
+      fromHistory: true // This is crucial - marks it as from history
+    };
+    
+    localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+    console.log('✅ HISTORY: Search results saved to localStorage:', {
+      places: placesForMap.length,
+      fromHistory: true
+    });
+    
+    // Clear any existing results first to force refresh
+    localStorage.removeItem('starmap-search-results');
+    setTimeout(() => {
+      localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+      router.push('/map');
+    }, 50);
   };
 
   const handleClearHistory = async () => {

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
-// GET - Fetch user's search history
+// GET - Fetch user's search history with places
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     
     const searchHistory = await prisma.searchHistory.findMany({
       where: { userId: decoded.userId },
+      include: {
+        places: true // Include related places
+      },
       orderBy: { searchedAt: 'desc' },
       take: 50, // Limit to last 50 searches
     });
@@ -28,7 +31,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Save new search to history
+// POST - Save new search to history with places data
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
     const body = await request.json();
     
-    const { region, placeType, minStars, searchRadius, resultsCount } = body;
+    const { region, placeType, minStars, searchRadius, resultsCount, places } = body;
 
     // Check if exact same search exists within last 5 minutes (avoid duplicates)
     const recentSearch = await prisma.searchHistory.findFirst({
@@ -57,18 +60,43 @@ export async function POST(request: NextRequest) {
     });
 
     if (recentSearch) {
-      // Update results count of recent search instead of creating duplicate
+      // Update recent search with new places data
+      await prisma.searchPlace.deleteMany({
+        where: { searchHistoryId: recentSearch.id }
+      });
+
+      // Add new places
+      if (places && places.length > 0) {
+        await prisma.searchPlace.createMany({
+          data: places.map((place: any) => ({
+            searchHistoryId: recentSearch.id,
+            placeId: place.id,
+            displayName: place.displayName,
+            rating: place.rating,
+            formattedAddress: place.formattedAddress,
+            latitude: place.location.lat,
+            longitude: place.location.lng,
+            types: place.types ? JSON.stringify(place.types) : null,
+            priceLevel: place.priceLevel,
+            websiteURI: place.websiteURI,
+            phoneNumber: place.nationalPhoneNumber,
+          }))
+        });
+      }
+
       const updatedSearch = await prisma.searchHistory.update({
         where: { id: recentSearch.id },
         data: { 
           resultsCount,
-          searchedAt: new Date() // Update timestamp
-        }
+          searchedAt: new Date()
+        },
+        include: { places: true }
       });
+
       return NextResponse.json({ searchHistory: updatedSearch });
     }
 
-    // Create new search history record
+    // Create new search history record with places
     const searchHistory = await prisma.searchHistory.create({
       data: {
         userId: decoded.userId,
@@ -77,7 +105,22 @@ export async function POST(request: NextRequest) {
         minStars,
         searchRadius,
         resultsCount,
-      }
+        places: {
+          create: places ? places.map((place: any) => ({
+            placeId: place.id,
+            displayName: place.displayName,
+            rating: place.rating,
+            formattedAddress: place.formattedAddress,
+            latitude: place.location.lat,
+            longitude: place.location.lng,
+            types: place.types ? JSON.stringify(place.types) : null,
+            priceLevel: place.priceLevel,
+            websiteURI: place.websiteURI,
+            phoneNumber: place.nationalPhoneNumber,
+          })) : []
+        }
+      },
+      include: { places: true }
     });
 
     return NextResponse.json({ searchHistory });

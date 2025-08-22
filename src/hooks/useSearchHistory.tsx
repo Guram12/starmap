@@ -1,5 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/app/AuthProvider';
+
+interface SearchPlace {
+  id: number;
+  placeId: string;
+  displayName: string;
+  rating: number | null;
+  formattedAddress: string | null;
+  latitude: number;
+  longitude: number;
+  types: string | null;
+  priceLevel: number | null;
+  websiteURI: string | null;
+  phoneNumber: string | null;
+}
 
 interface SearchHistoryItem {
   id: number;
@@ -9,69 +22,72 @@ interface SearchHistoryItem {
   searchRadius: number;
   resultsCount: number;
   searchedAt: string;
+  places: SearchPlace[];
+}
+
+interface SearchParams {
+  region: string;
+  placeType: string;
+  minStars: number;
+  searchRadius: number;
+  resultsCount: number;
 }
 
 export function useSearchHistory() {
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated } = useAuth();
 
   // Fetch search history
   const fetchSearchHistory = useCallback(async () => {
-    if (!isAuthenticated) return;
-    
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/search-history');
-      const data = await response.json();
       
-      if (response.ok) {
-        setSearchHistory(data.searchHistory);
-      } else {
-        setError(data.error || 'Failed to fetch search history');
+      if (!response.ok) {
+        if (response.status === 401) {
+          // User not authenticated, return empty array
+          setSearchHistory([]);
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } catch (_err) {
-      setError('Network error');
+
+      const data = await response.json();
+      setSearchHistory(data.searchHistory || []);
+    } catch (err) {
+      console.error('Error fetching search history:', err);
+      setError('Failed to load search history');
+      setSearchHistory([]);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, []);
 
   // Save search to history
-  const saveSearchToHistory = useCallback(async (searchData: {
-    region: string;
-    placeType: string;
-    minStars: number;
-    searchRadius: number;
-    resultsCount: number;
-  }) => {
-    if (!isAuthenticated) return;
-
+  const saveSearchToHistory = useCallback(async (searchParams: SearchParams) => {
     try {
       const response = await fetch('/api/search-history', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(searchData),
+        body: JSON.stringify(searchParams),
       });
 
       if (response.ok) {
-        // Refresh search history
-        fetchSearchHistory();
+        // Refresh history after saving
+        await fetchSearchHistory();
       }
     } catch (err) {
-      console.error('Failed to save search history:', err);
+      console.error('Error saving search to history:', err);
     }
-  }, [isAuthenticated, fetchSearchHistory]);
+  }, [fetchSearchHistory]);
 
   // Clear search history
   const clearSearchHistory = useCallback(async () => {
-    if (!isAuthenticated) return;
-
     try {
       const response = await fetch('/api/search-history', {
         method: 'DELETE',
@@ -81,18 +97,15 @@ export function useSearchHistory() {
         setSearchHistory([]);
       }
     } catch (err) {
-      console.error('Failed to clear search history:', err);
+      console.error('Error clearing search history:', err);
+      setError('Failed to clear search history');
     }
-  }, [isAuthenticated]);
+  }, []);
 
-  // Load search history when user is authenticated
+  // Load search history on mount
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchSearchHistory();
-    } else {
-      setSearchHistory([]);
-    }
-  }, [isAuthenticated, fetchSearchHistory]);
+    fetchSearchHistory();
+  }, [fetchSearchHistory]);
 
   return {
     searchHistory,
@@ -100,6 +113,6 @@ export function useSearchHistory() {
     error,
     saveSearchToHistory,
     clearSearchHistory,
-    refreshHistory: fetchSearchHistory,
+    fetchSearchHistory,
   };
 }
