@@ -1,5 +1,3 @@
-
-
 import { useState, useCallback, useRef } from 'react';
 import { useEffect } from 'react';
 
@@ -249,3 +247,6 @@ export function usePlacesSearch() {
 
   return { places, loading, error, searchPlaces, geocodeLocation };
 }
+
+// This hook is now used only from the preferences page for searching
+// The map page loads results from localStorage instead of making API calls

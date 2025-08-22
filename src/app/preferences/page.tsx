@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';
+import { usePlacesSearch } from '../../hooks/usePlacesSearch';
+import { useGoogleMap } from '../../hooks/useGoogleMap';
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
 
@@ -13,6 +15,11 @@ export default function Preferences() {
   const [searchRadius, setSearchRadius] = useState(5);
   const [showSuccess, setShowSuccess] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  // Add map and search hooks
+  const { mapRef, map, isLoaded } = useGoogleMap();
+  const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
 
   // Load preferences from localStorage on component mount
   useEffect(() => {
@@ -73,23 +80,71 @@ export default function Preferences() {
   };
 
 
-  const savePreferences = () => {
-    const preferences = {
-      region,
-      placeType,
-      minStars,
-      searchRadius,
-      timestamp: new Date().toISOString()
-    };
+  const savePreferences = async () => {
+    if (!region.trim()) {
+      alert('Please enter a region before saving.');
+      return;
+    }
 
-    localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
-    setShowSuccess(true);
+    setSearchLoading(true);
 
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 3000);
+    try {
+      // Save preferences
+      const preferences = {
+        region,
+        placeType,
+        minStars,
+        searchRadius,
+        timestamp: new Date().toISOString()
+      };
+
+      localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
+
+      // Perform search if map is loaded
+      if (map && isLoaded) {
+        console.log('🔍 PREFERENCES: Starting search with saved preferences');
+        
+        const location = await geocodeLocation(region);
+        
+        if (location) {
+          await searchPlaces(map, {
+            location,
+            radius: searchRadius,
+            type: placeType,
+            minRating: minStars
+          }, region);
+
+          console.log('✅ PREFERENCES: Search completed, storing results');
+        } else {
+          throw new Error('Could not find the specified location');
+        }
+      } else {
+        throw new Error('Map not ready for search');
+      }
+
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+
+    } catch (error) {
+      console.error('Error saving preferences or searching:', error);
+      alert('Error: ' + (error as Error).message);
+    } finally {
+      setSearchLoading(false);
+    }
   };
+
+  // Store search results when places update
+  useEffect(() => {
+    if (places && places.length > 0) {
+      const searchResults = {
+        places,
+        searchParams: { region, placeType, minStars, searchRadius },
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
+      console.log('✅ PREFERENCES: Search results stored in localStorage');
+    }
+  }, [places, region, placeType, minStars, searchRadius]);
 
   const getPlaceTypeIcon = (type: PlaceType): string => {
     const icons: Record<PlaceType, string> = {
@@ -102,11 +157,15 @@ export default function Preferences() {
     return icons[type] || '📍';
   };
 
-
   
   return (
     <div className={styles.preferencesPage}>
       <div className={styles.container}>
+        {/* Hidden map for search functionality */}
+        <div style={{ display: 'none' }}>
+          <div ref={mapRef} style={{ width: '100px', height: '100px' }} />
+        </div>
+
         <div className={styles.header}>
           <h1 className={styles.title}>
             ⚙️ Set Your Preferences
@@ -222,15 +281,47 @@ export default function Preferences() {
             </div>
           </div>
 
-          {!showSuccess && (
+          {searchLoading && (
+            <div style={{ 
+              padding: '12px', 
+              backgroundColor: '#dbeafe', 
+              border: '1px solid #3b82f6', 
+              borderRadius: '8px', 
+              color: '#1e40af',
+              textAlign: 'center',
+              margin: '16px 0'
+            }}>
+              🔍 Searching for places... Please wait.
+            </div>
+          )}
+
+          {searchError && (
+            <div style={{ 
+              padding: '12px', 
+              backgroundColor: '#fef2f2', 
+              border: '1px solid #ef4444', 
+              borderRadius: '8px', 
+              color: '#dc2626',
+              textAlign: 'center',
+              margin: '16px 0'
+            }}>
+              ❌ Search Error: {searchError}
+            </div>
+          )}
+
+          {showSuccess && (
             <div className={styles.successMessage}>
-              ✅ Preferences saved successfully!
+              ✅ Preferences saved and places searched successfully! Found {places.length} places.
             </div>
           )}
 
           <div className={styles.actions}>
-            <button type="submit" className={`${styles.actionBtn} ${styles.saveBtn}`}>
-              💾 Save Preferences
+            <button 
+              type="submit" 
+              className={`${styles.actionBtn} ${styles.saveBtn}`}
+              disabled={searchLoading || !isLoaded}
+            >
+              {searchLoading ? '🔍 Searching...' : '💾 Save & Search'}
             </button>
             <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
               🗺️ Go to Map

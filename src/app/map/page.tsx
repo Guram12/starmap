@@ -2,12 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
-import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import styles from './Map.module.css';
 import { MapPinned } from 'lucide-react';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useAuth } from '../AuthProvider';
 
+
+interface Place {
+  id: string;
+  displayName: string;
+  rating?: number | null;
+  formattedAddress?: string | null;
+  location: google.maps.LatLng;
+  photos?: google.maps.places.PlacePhoto[];
+  types?: string[];
+  priceLevel?: google.maps.places.PriceLevel | null;
+  websiteURI?: string | null;
+  nationalPhoneNumber?: string | null;
+}
 
 interface Preferences {
   region: string;
@@ -23,29 +35,18 @@ export default function MapPage() {
     minStars: 3,
     searchRadius: 5
   });
+  const [places, setPlaces] = useState<Place[]>([]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [lastSearchTime, setLastSearchTime] = useState(0);
-  const MIN_SEARCH_INTERVAL = 3000; // 3 seconds between searches
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
-
-  const { places, loading, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
-
   const { saveSearchToHistory } = useSearchHistory();
   const { isAuthenticated } = useAuth();
 
 
-
-
-  //=====================================    Load places when map and preferences are ready     ====================================
+  //=====================================    Load preferences and search results from localStorage     ====================================
   useEffect(() => {
-    console.log('Places updated:', places);
-  }, [places]);
-
-
-  //=====================================    Load preferences from localStorage     ==================================== 
-  useEffect(() => {
+    // Load preferences
     const savedPrefs = localStorage.getItem('starmap-preferences');
     if (savedPrefs) {
       const prefs = JSON.parse(savedPrefs);
@@ -56,67 +57,35 @@ export default function MapPage() {
         searchRadius: prefs.searchRadius || 5
       });
     }
+
+    // Load search results
+    const savedResults = localStorage.getItem('starmap-search-results');
+    if (savedResults) {
+      const results = JSON.parse(savedResults);
+      // Convert plain objects back to LatLng objects
+      const placesWithLatLng = results.places.map((place: any) => ({
+        ...place,
+        location: new google.maps.LatLng(place.location.lat, place.location.lng)
+      }));
+      setPlaces(placesWithLatLng);
+      console.log('✅ MAP PAGE: Loaded search results from localStorage:', placesWithLatLng.length, 'places');
+    }
+
     setPrefsLoaded(true);
   }, []);
 
-  //============================ Search for places when map loads and preferences are available  =======================
+  //============================ Center map when preferences load and places are available  =======================
   useEffect(() => {
-    const performSearch = async () => {
-      console.log('🚀 MAP PAGE: Starting search process');
-      console.log('📋 MAP PAGE: Conditions check:', {
-        hasMap: !!map,
-        hasRegion: !!preferences.region,
-        isLoaded,
-        prefsLoaded,
-        timestamp: new Date().toISOString()
-      });
-
-      if (!map || !preferences.region || !isLoaded) {
-        console.log('❌ MAP PAGE: Search cancelled - missing requirements');
-        return;
+    if (map && isLoaded && preferences.region && places.length > 0) {
+      // Center map on first place or use geocoding for region
+      const firstPlace = places[0];
+      if (firstPlace && firstPlace.location) {
+        map.setCenter(firstPlace.location);
+        map.setZoom(12);
+        console.log('✅ MAP PAGE: Map centered on search results');
       }
-
-      // Rate limiting
-      const now = Date.now();
-      if (now - lastSearchTime < MIN_SEARCH_INTERVAL) {
-        console.log('🛑 MAP PAGE: Search rate limited - no API calls');
-        return;
-      }
-
-      console.log('▶️ MAP PAGE: Proceeding with search');
-
-      try {
-        console.log('🗺️ MAP PAGE: Calling geocodeLocation');
-        const location = await geocodeLocation(preferences.region);
-
-        if (location) {
-          console.log('✅ MAP PAGE: Location found, centering map');
-          map.setCenter(location);
-          map.setZoom(12);
-
-          setLastSearchTime(now);
-
-          console.log('🔍 MAP PAGE: Calling searchPlaces');
-          await searchPlaces(map, {
-            location,
-            radius: preferences.searchRadius,
-            type: preferences.placeType,
-            minRating: preferences.minStars
-          }, preferences.region);
-
-          console.log('✅ MAP PAGE: Search process completed');
-        } else {
-          console.log('❌ MAP PAGE: No location found');
-        }
-      } catch (error) {
-        console.error('❌ MAP PAGE: Search failed:', error);
-      }
-    };
-
-    if (prefsLoaded && preferences.region) {
-      performSearch();
     }
-  }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation, lastSearchTime]);
+  }, [map, isLoaded, preferences.region, places]);
 
   useEffect(() => {
     if (isAuthenticated && places.length > 0 && preferences.region) {
@@ -243,13 +212,24 @@ export default function MapPage() {
                 <span className={styles.settingValue}>{preferences.searchRadius} km</span>
               </div>
 
+              {!places.length && preferences.region && (
+                <div style={{ 
+                  padding: '12px', 
+                  backgroundColor: '#fef3c7', 
+                  border: '1px solid #f59e0b', 
+                  borderRadius: '8px', 
+                  color: '#92400e',
+                  fontSize: '14px',
+                  marginTop: '12px'
+                }}>
+                  💡 No search results found. Go to Preferences to search for places.
+                </div>
+              )}
             </div>
 
             <div >
               <h3 className={styles.result_cardTitle}>📍 Results ({places.length})</h3>
 
-              {loading && <p>Searching places...</p>}
-              {searchError && <p style={{ color: 'red' }}>{searchError}</p>}
               {places.length > 0 && (
                 <div className={styles.placesList}>
                   {places.map((place) => (
@@ -271,7 +251,7 @@ export default function MapPage() {
                 <MapPinned className={styles.mapIcon} /> Interactive Map
               </h3>
               <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-                {preferences.region ? `Searching in ${preferences.region}` : 'Set region to search'}
+                {preferences.region ? `Showing results for ${preferences.region}` : 'Set region in preferences'}
               </span>
             </div>
 
@@ -280,18 +260,16 @@ export default function MapPage() {
                 <p>❌ Error loading map: {mapError}</p>
               </div>
             ) : (
-              <>
-                <div
-                  ref={mapRef}
-                  className={styles.mapDiv}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '12px',
-                    backgroundColor: '#20499B'
-                  }}
-                />
-              </>
+              <div
+                ref={mapRef}
+                className={styles.mapDiv}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '12px',
+                  backgroundColor: '#20499B'
+                }}
+              />
             )}
           </div>
         </div>
