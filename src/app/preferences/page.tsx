@@ -102,6 +102,8 @@ export default function Preferences() {
     return icons[type] || '📍';
   };
 
+
+  
   return (
     <div className={styles.preferencesPage}>
       <div className={styles.container}>
@@ -220,7 +222,7 @@ export default function Preferences() {
             </div>
           </div>
 
-          {showSuccess && (
+          {!showSuccess && (
             <div className={styles.successMessage}>
               ✅ Preferences saved successfully!
             </div>

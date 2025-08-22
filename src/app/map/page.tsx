@@ -62,31 +62,54 @@ export default function MapPage() {
   //============================ Search for places when map loads and preferences are available  =======================
   useEffect(() => {
     const performSearch = async () => {
-      if (!map || !preferences.region || !isLoaded) return;
+      console.log('🚀 MAP PAGE: Starting search process');
+      console.log('📋 MAP PAGE: Conditions check:', {
+        hasMap: !!map,
+        hasRegion: !!preferences.region,
+        isLoaded,
+        prefsLoaded,
+        timestamp: new Date().toISOString()
+      });
+
+      if (!map || !preferences.region || !isLoaded) {
+        console.log('❌ MAP PAGE: Search cancelled - missing requirements');
+        return;
+      }
 
       // Rate limiting
       const now = Date.now();
       if (now - lastSearchTime < MIN_SEARCH_INTERVAL) {
-        console.log('Search rate limited');
+        console.log('🛑 MAP PAGE: Search rate limited - no API calls');
         return;
       }
 
+      console.log('▶️ MAP PAGE: Proceeding with search');
+
       try {
+        console.log('🗺️ MAP PAGE: Calling geocodeLocation');
         const location = await geocodeLocation(preferences.region);
+
         if (location) {
+          console.log('✅ MAP PAGE: Location found, centering map');
           map.setCenter(location);
           map.setZoom(12);
 
           setLastSearchTime(now);
+
+          console.log('🔍 MAP PAGE: Calling searchPlaces');
           await searchPlaces(map, {
             location,
             radius: preferences.searchRadius,
             type: preferences.placeType,
             minRating: preferences.minStars
-          }, preferences.region); // Pass the region name
+          }, preferences.region);
+
+          console.log('✅ MAP PAGE: Search process completed');
+        } else {
+          console.log('❌ MAP PAGE: No location found');
         }
       } catch (error) {
-        console.error('Search failed:', error);
+        console.error('❌ MAP PAGE: Search failed:', error);
       }
     };
 
@@ -94,7 +117,6 @@ export default function MapPage() {
       performSearch();
     }
   }, [map, isLoaded, preferences, prefsLoaded, searchPlaces, geocodeLocation, lastSearchTime]);
-
 
   useEffect(() => {
     if (isAuthenticated && places.length > 0 && preferences.region) {

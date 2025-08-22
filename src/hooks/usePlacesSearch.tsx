@@ -1,4 +1,8 @@
+
+
 import { useState, useCallback, useRef } from 'react';
+import { useEffect } from 'react';
+
 
 interface Place {
   id: string;
@@ -35,6 +39,30 @@ export function usePlacesSearch() {
   const DEBOUNCE_DELAY = 1000; // 1 second
   const MAX_RESULTS = 15; // Fixed limit for all searches
 
+
+  // Suppress Google Maps deprecation warnings for cost optimization
+  useEffect(() => {
+    const originalWarn = console.warn;
+    console.warn = function(message, ...args) {
+      // Suppress specific Google Maps deprecation warnings
+      if (typeof message === 'string' && (
+        message.includes('google.maps.places.PlacesService is not available') ||
+        message.includes('google.maps.Marker is deprecated') ||
+        message.includes('PlacesService') ||
+        message.includes('AdvancedMarkerElement')
+      )) {
+        return; // Suppress these warnings
+      }
+      // Allow other warnings to show
+      originalWarn.apply(console, [message, ...args]);
+    };
+
+    // Cleanup function to restore original console.warn when component unmounts
+    return () => {
+      console.warn = originalWarn;
+    };
+  }, []);
+
   const searchPlaces = useCallback(async (
     map: google.maps.Map,
     params: SearchParams,
@@ -45,17 +73,23 @@ export function usePlacesSearch() {
     // Create cache key
     const cacheKey = `${params.location.lat()}-${params.location.lng()}-${params.radius}-${params.type}-${params.minRating || 0}`;
 
+    console.log('🔍 PLACES SEARCH REQUEST:', {
+      locationName,
+      cacheKey,
+      timestamp: new Date().toISOString()
+    });
+
     // Check cache first
     const cached = cache.current.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Using cached results');
+      console.log('✅ USING CACHED RESULTS - NO API CALL');
       setPlaces(cached.data);
       return;
     }
 
     // Prevent duplicate requests
     if (lastSearchRef.current === cacheKey) {
-      console.log('Duplicate request prevented');
+      console.log('🚫 DUPLICATE REQUEST PREVENTED - NO API CALL');
       return;
     }
 
@@ -69,6 +103,15 @@ export function usePlacesSearch() {
       lastSearchRef.current = cacheKey;
       setLoading(true);
       setError(null);
+
+      console.log('🌐 MAKING GOOGLE PLACES API CALL:', {
+        location: `${params.location.lat()}, ${params.location.lng()}`,
+        radius: params.radius,
+        type: params.type,
+        minRating: params.minRating,
+        timestamp: new Date().toISOString()
+      });
+
 
       try {
         const service = new google.maps.places.PlacesService(map);
@@ -137,8 +180,20 @@ export function usePlacesSearch() {
     }, DEBOUNCE_DELAY);
 
   }, []);
+
+
+
+
+
+
+
+
+
+
   const geocodeLocation = useCallback(async (locationName: string): Promise<google.maps.LatLng | null> => {
-    // Check if input is already coordinates (lat, lng format)
+    console.log('🗺️ GEOCODING REQUEST:', { locationName, timestamp: new Date().toISOString() });
+
+    // Check if input is already coordinates
     const coordPattern = /^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/;
     const coordMatch = locationName.trim().match(coordPattern);
 
@@ -146,9 +201,8 @@ export function usePlacesSearch() {
       const lat = parseFloat(coordMatch[1]);
       const lng = parseFloat(coordMatch[2]);
 
-      // Validate coordinate ranges
       if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-        console.log('Using direct coordinates:', lat, lng);
+        console.log('✅ USING DIRECT COORDINATES - NO API CALL:', { lat, lng });
         return new google.maps.LatLng(lat, lng);
       }
     }
@@ -158,14 +212,22 @@ export function usePlacesSearch() {
     const cached = geocodingCache.current.get(normalizedName);
 
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Using cached geocoding result');
+      console.log('✅ USING CACHED GEOCODING - NO API CALL');
       return cached.location;
     }
+
+    console.log('🌐 MAKING GOOGLE GEOCODING API CALL:', { locationName, timestamp: new Date().toISOString() });
 
     // Use geocoding service for city/address names
     return new Promise((resolve) => {
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address: locationName }, (results, status) => {
+        console.log('📡 GOOGLE GEOCODING API RESPONSE:', {
+          status,
+          hasResults: !!(results && results[0]),
+          timestamp: new Date().toISOString()
+        });
+
         if (status === 'OK' && results && results[0]) {
           const location = results[0].geometry.location;
 
@@ -175,8 +237,10 @@ export function usePlacesSearch() {
             timestamp: Date.now()
           });
 
+          console.log('✅ GEOCODING COMPLETED AND CACHED');
           resolve(location);
         } else {
+          console.log('❌ GEOCODING FAILED:', status);
           resolve(null);
         }
       });
