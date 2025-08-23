@@ -129,6 +129,12 @@ export default function Preferences() {
   };
 
   const saveSearchWithPlacesToDatabase = useCallback(async () => {
+    // Only save to database if user is authenticated
+    if (!isAuthenticated) {
+      console.log('👤 PREFERENCES: User not authenticated - skipping database save');
+      return;
+    }
+
     console.log('💾 PREFERENCES: Saving search with places to database:', {
       placesCount: places.length,
       region,
@@ -173,7 +179,7 @@ export default function Preferences() {
     } catch (error) {
       console.error('❌ PREFERENCES: Error saving search to database:', error);
     }
-  }, [places, region, placeType, minStars, searchRadius]);
+  }, [places, region, placeType, minStars, searchRadius, isAuthenticated]);
 
   // Store search results when places update
   useEffect(() => {
@@ -184,12 +190,19 @@ export default function Preferences() {
         timestamp: new Date().toISOString(),
         fromHistory: false // Mark as fresh search
       };
+      
+      // Always save to localStorage (overwrites previous search for non-authenticated users)
       localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
-      console.log('✅ PREFERENCES: Search results stored in localStorage');
+      console.log('✅ PREFERENCES: Search results stored in localStorage', {
+        authenticated: isAuthenticated,
+        placesCount: places.length
+      });
 
-      // Also save to database if authenticated
+      // Only save to database if authenticated
       if (isAuthenticated) {
         saveSearchWithPlacesToDatabase();
+      } else {
+        console.log('👤 PREFERENCES: Non-authenticated user - only saving to localStorage');
       }
     }
   }, [places, region, placeType, minStars, searchRadius, isAuthenticated, saveSearchWithPlacesToDatabase]);
