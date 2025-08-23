@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
     const token = request.cookies.get('auth-token')?.value;
     
     if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      // Return early for unauthenticated users - don't process the request
+      return NextResponse.json({ message: 'Not authenticated - skipping database save' }, { status: 200 });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };

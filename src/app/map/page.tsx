@@ -111,6 +111,7 @@ export default function MapPage() {
 
   // Save to history only for fresh searches, not when loading from history
   useEffect(() => {
+    // Only save to database if authenticated AND we have places AND it's not from history
     if (isAuthenticated && places.length > 0 && preferences.region && !isFromHistory) {
       console.log('💾 MAP PAGE: Saving fresh search to history with places');
       saveSearchToHistory({
@@ -136,13 +137,20 @@ export default function MapPage() {
       });
     } else if (isFromHistory) {
       console.log('📂 MAP PAGE: Skipping history save - results are from history');
+    } else if (!isAuthenticated) {
+      console.log('👤 MAP PAGE: Skipping database save - user not authenticated');
     }
   }, [places, preferences, isAuthenticated, saveSearchToHistory, isFromHistory]);
 
 
   // =========================================  Update markers when places change  =============================================
   useEffect(() => {
-    if (!map || !places.length) return;
+    if (!map || !places.length) {
+      // Clear existing markers if no places
+      markers.forEach(marker => marker.setMap(null));
+      setMarkers([]);
+      return;
+    }
 
     // Clear existing markers
     markers.forEach(marker => marker.setMap(null));
@@ -177,7 +185,12 @@ export default function MapPage() {
     });
 
     setMarkers(newMarkers);
-  }, [map, places, preferences.placeType, markers]);
+
+    // Cleanup function to remove markers when component unmounts or places change
+    return () => {
+      newMarkers.forEach(marker => marker.setMap(null));
+    };
+  }, [map, places, preferences.placeType]); // Remove 'markers' from dependencies to prevent infinite loop
 
 
   // ==============================================    set marker icon   ==================================================

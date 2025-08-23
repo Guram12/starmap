@@ -84,7 +84,7 @@ export function useSearchHistory() {
 
   // Save search to history
   const saveSearchToHistory = useCallback(async (searchParams: SearchParams) => {
-    console.log('💾 HOOK: Saving search to history:', {
+    console.log('💾 HOOK: Attempting to save search to history:', {
       region: searchParams.region,
       placesCount: searchParams.places?.length || 0,
       hasPlaces: !!searchParams.places
@@ -100,6 +100,11 @@ export function useSearchHistory() {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        if (result.message && result.message.includes('Not authenticated')) {
+          console.log('👤 HOOK: User not authenticated - skipping database save');
+          return;
+        }
         console.log('✅ HOOK: Search saved successfully');
         // Refresh history after saving
         await fetchSearchHistory();
