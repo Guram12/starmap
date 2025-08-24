@@ -99,7 +99,7 @@ export default function HistoryPage() {
     }
   };
 
-  // Calculate stats
+  // =================================   Calculate stats    ====================================
   const totalSearches = searchHistory.length;
   const uniqueRegions = new Set(searchHistory.map(item => item.region)).size;
   const totalResults = searchHistory.reduce((sum, item) => sum + item.resultsCount, 0);
