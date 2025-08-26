@@ -36,8 +36,8 @@ export default function CookieBanner() {
             <div className={styles.textContainer}>
               <p className={styles.text}>
                 <span className={styles.emoji}>🍪</span>
-                This website uses cookies to provide authentication and improve your experience.
-                By continuing to use this site, you agree to our use of cookies.
+                This website uses cookies to enhance your experience and provide secure authentication.
+                By continuing to use our site, you agree to our use of cookies.
               </p>
             </div>
             <button

@@ -36,7 +36,8 @@ export default function Login() {
       })
 
       const data = await response.json()
-
+      console.log('Login response:', data)
+      debugger;
       if (response.ok) {
         // Update auth context
         await login(formData.username, formData.password)
