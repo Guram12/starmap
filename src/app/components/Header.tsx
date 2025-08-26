@@ -27,7 +27,7 @@ export default function Header() {
   ];
 
   useEffect(() => {
-    console.log('User authentication status:', isAuthenticated);
+    console.log('User authentication status:==========?????????????', isAuthenticated);
   }, [isAuthenticated]);
 
   // Update indicator position when pathname changes

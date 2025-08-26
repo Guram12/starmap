@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-
     // Authenticate user
     const user = await authenticateUser(username, password)
 
@@ -44,6 +43,7 @@ export async function POST(request: NextRequest) {
     )
 
     const response = NextResponse.json({
+      success: true,
       message: 'Login successful',
       user: {
         id: user.id,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
