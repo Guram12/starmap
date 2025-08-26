@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticateUser } from '@/lib/auth'
+import { authenticateUser, findUserByUsername , findUserByEmail} from '@/lib/auth'
 import jwt from 'jsonwebtoken'
 
 export async function POST(request: NextRequest) {
@@ -10,6 +10,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing username or password' },
         { status: 400 }
+      )
+    }
+
+    // check if user exists 
+    let userExists = await findUserByUsername(username)
+    if (!userExists) {
+      userExists = await findUserByEmail(username)
+    }
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'User does not exist' },
+        { status: 404 }
       )
     }
 
@@ -31,6 +43,7 @@ export async function POST(request: NextRequest) {
     )
 
     const response = NextResponse.json({
+      success: true,
       message: 'Login successful',
       user: {
         id: user.id,
@@ -52,7 +65,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }

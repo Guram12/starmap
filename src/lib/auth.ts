@@ -47,3 +47,17 @@ export async function authenticateUser(username: string, password: string) {
   const { password: _, ...userWithoutPassword } = user
   return userWithoutPassword
 }
+
+
+export const findUserByUsername = async (username: string) => {
+  return await prisma.user.findUnique({
+    where: { username }
+  })
+}
+
+
+export const findUserByEmail = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: { email }
+  })
+}

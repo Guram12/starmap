@@ -149,9 +149,6 @@ export default function HistoryPage() {
         </div>
 
         <div className={styles.actions}>
-          <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
-            🗺️ Go to Map
-          </Link>
           <Link href="/preferences" className={`${styles.actionBtn} ${styles.preferencesBtn}`}>
             ⚙️ Preferences
           </Link>
@@ -206,18 +203,6 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                <div className={styles.historyHeader}>
-                  <h3 className={styles.historyTitle}>
-                    🕒 Recent Searches
-                  </h3>
-                  <button
-                    onClick={handleClearHistory}
-                    className={styles.clearHistoryBtn}
-                    title="Clear all history"
-                  >
-                    🗑️ Clear
-                  </button>
-                </div>
               </>
             )}
 

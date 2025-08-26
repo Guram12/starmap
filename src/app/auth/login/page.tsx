@@ -24,26 +24,14 @@ export default function Login() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        // Update auth context
-        await login(formData.username, formData.password)
-        // Redirect to map
+      // Use the login function from AuthProvider instead of direct fetch
+      const result = await login(formData.username, formData.password)
+      
+      if (result.success) {
+        // Redirect to map on successful login
         router.push('/map')
       } else {
-        setError(data.error || 'Login failed')
+        setError(result.error || 'Login failed')
       }
     } catch (_error) {
       setError('Network error. Please try again.')

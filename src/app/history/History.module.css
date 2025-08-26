@@ -102,12 +102,11 @@
 }
 
 .homeBtn {
-  background: #6b7280;
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .homeBtn:hover {
-  background: #4b5563;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
 }
@@ -177,6 +176,7 @@
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+  overflow-x: hidden;
 }
 
 .historyItem {
@@ -193,9 +193,10 @@
 
 .historyItem:hover {
   background: #f8fafc;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #10b981;
   transform: translateX(4px);
 }
+
 
 .historyItem:last-child {
   border-bottom: none;
