@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  provider        = "prisma-client-js"
 }
 
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -47,13 +47,13 @@ model SearchHistory {
 model SearchPlace {
   id               Int     @id @default(autoincrement())
   searchHistoryId  Int
-  placeId          String  // Google Place ID
+  placeId          String 
   displayName      String
   rating           Float?
   formattedAddress String?
   latitude         Float
   longitude        Float
-  types            String? // JSON string of place types
+  types            String? 
   priceLevel       Int?
   websiteURI       String?
   phoneNumber      String?
