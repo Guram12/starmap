@@ -71,7 +71,7 @@ export default function MapPage() {
     if (savedResults) {
       const results = JSON.parse(savedResults);
       setIsFromHistory(!!results.fromHistory);
-      
+
       // Convert plain objects back to LatLng objects - now safe to use
       const placesWithLatLng = results.places.map((place: {
         id: string;
@@ -238,6 +238,24 @@ export default function MapPage() {
     );
   }
 
+  if (preferences.region === '') {
+    return (
+      <div className={styles.no_region_container}>
+        <div className={styles.no_region_errorMessage}>
+          <p>⚠️ No region set. Please go to Preferences to set your search criteria.</p>
+        </div>
+
+        <button className={styles.setregion_button}>
+          <a href="/preferences?f=region" className={styles.actionBtn}>
+            ⚙️ Go to Preferences
+          </a>
+        </button>
+
+      </div>
+    );
+  }
+
+
   return (
     <div className={styles.mapPage}>
       <div className={styles.container}>
@@ -248,13 +266,13 @@ export default function MapPage() {
             {/* Your existing sidebar content */}
             <div className={styles.settingsCard}>
               <h3 className={styles.cardTitle}>⚙️ Current Settings</h3>
-              
+
               {isFromHistory && (
-                <div style={{ 
-                  padding: '8px 12px', 
-                  backgroundColor: '#dbeafe', 
-                  border: '1px solid #3b82f6', 
-                  borderRadius: '6px', 
+                <div style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#dbeafe',
+                  border: '1px solid #3b82f6',
+                  borderRadius: '6px',
                   color: '#1e40af',
                   fontSize: '12px',
                   marginBottom: '12px',
@@ -282,11 +300,11 @@ export default function MapPage() {
               </div>
 
               {!places.length && preferences.region && !isFromHistory && (
-                <div style={{ 
-                  padding: '12px', 
-                  backgroundColor: '#fef3c7', 
-                  border: '1px solid #f59e0b', 
-                  borderRadius: '8px', 
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#fef3c7',
+                  border: '1px solid #f59e0b',
+                  borderRadius: '8px',
                   color: '#92400e',
                   fontSize: '14px',
                   marginTop: '12px'
@@ -299,7 +317,7 @@ export default function MapPage() {
             <div >
               <h3 className={styles.result_cardTitle}>
                 📍 Results ({places.length})
-                {isFromHistory && <span style={{fontSize: '12px', color: '#6b7280'}}> from history</span>}
+                {isFromHistory && <span style={{ fontSize: '12px', color: '#6b7280' }}> from history</span>}
               </h3>
 
               {places.length > 0 && (
@@ -320,7 +338,7 @@ export default function MapPage() {
           <div className={styles.mapContainer}>
             <div className={styles.mapHeader}>
               <h3 className={styles.mapTitle}>
-                <MapPinned className={styles.mapIcon} /> Interactive Map
+                <MapPinned className={styles.mapIcon} /> Map
               </h3>
               <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
                 {preferences.region ? `Showing results for ${preferences.region}` : 'Set region in preferences'}

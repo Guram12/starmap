@@ -1,26 +1,36 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
 import { useAuth } from '../AuthProvider';
+import SyncLoader from "react-spinners/SyncLoader";
+import { useSearchParams } from 'next/navigation';
+
+
+
+
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
 
 export default function Preferences() {
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState<string>('');
   const [placeType, setPlaceType] = useState<PlaceType>('restaurant');
-  const [minStars, setMinStars] = useState(3);
-  const [searchRadius, setSearchRadius] = useState(5);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [minStars, setMinStars] = useState<number>(3);
+  const [searchRadius, setSearchRadius] = useState<number>(5);
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [locationLoading, setLocationLoading] = useState<boolean>(false);
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const { mapRef, map, isLoaded } = useGoogleMap();
-  const { places, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch(); // Remove unused 'loading'
+  const { places, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
   const { isAuthenticated } = useAuth();
 
+
+
+
+  // ================================================ load saved preferences ================================================
   useEffect(() => {
     const savedPrefs = localStorage.getItem('starmap-preferences');
     if (savedPrefs) {
@@ -32,6 +42,7 @@ export default function Preferences() {
     }
   }, []);
 
+  // ===================================================  current location ===================================================
   const getCurrentLocation = () => {
     setLocationLoading(true);
 
@@ -72,10 +83,12 @@ export default function Preferences() {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 300000 // 5 minutes
+        maximumAge: 300000
       }
     );
   };
+
+  // ==============================================  save preferences & search ================================================
 
   const savePreferences = async () => {
     if (!region.trim()) {
@@ -98,9 +111,9 @@ export default function Preferences() {
 
       if (map && isLoaded) {
         console.log('🔍 PREFERENCES: Starting search with saved preferences');
-        
+
         const location = await geocodeLocation(region);
-        
+
         if (location) {
           await searchPlaces(map, {
             location,
@@ -111,7 +124,7 @@ export default function Preferences() {
 
           console.log('✅ PREFERENCES: Search completed, storing results');
         } else {
-          throw new Error('Could not find the specified location');
+          setError('Could not find the specified location');
         }
       } else {
         throw new Error('Map not ready for search');
@@ -127,6 +140,8 @@ export default function Preferences() {
       setSearchLoading(false);
     }
   };
+
+  // ===================================================  save to database ===================================================
 
   const saveSearchWithPlacesToDatabase = useCallback(async () => {
     // Only save to database if user is authenticated
@@ -181,7 +196,8 @@ export default function Preferences() {
     }
   }, [places, region, placeType, minStars, searchRadius, isAuthenticated]);
 
-  // Store search results when places update
+  // =================================================  store in localStorage =================================================
+
   useEffect(() => {
     if (places && places.length > 0) {
       const searchResults = {
@@ -190,7 +206,7 @@ export default function Preferences() {
         timestamp: new Date().toISOString(),
         fromHistory: false // Mark as fresh search
       };
-      
+
       // Always save to localStorage (overwrites previous search for non-authenticated users)
       localStorage.setItem('starmap-search-results', JSON.stringify(searchResults));
       console.log('✅ PREFERENCES: Search results stored in localStorage', {
@@ -205,7 +221,21 @@ export default function Preferences() {
         console.log('👤 PREFERENCES: Non-authenticated user - only saving to localStorage');
       }
     }
-  }, [places, region, placeType, minStars, searchRadius, isAuthenticated, saveSearchWithPlacesToDatabase]);
+  }, [places]);
+
+  // ===================================================  focus region input ===================================================
+
+  const regionInputRef = useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('f') === 'region' && regionInputRef.current) {
+      regionInputRef.current.focus();
+    }
+  }, [searchParams]);
+
+
+  // ===================================================  utility functions ===================================================
 
   const getPlaceTypeIcon = (type: PlaceType): string => {
     const icons: Record<PlaceType, string> = {
@@ -218,7 +248,24 @@ export default function Preferences() {
     return icons[type] || '📍';
   };
 
-  
+  const [showError, setShowError] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    if (searchError) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setError(null);
+        setTimeout(() => setShowError(false), 500);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchError]);
+
+
+  // ==========================================================================================================================
+
+
   return (
     <div className={styles.preferencesPage}>
       <div className={styles.container}>
@@ -246,6 +293,7 @@ export default function Preferences() {
                 id="region"
                 type="text"
                 value={region}
+                ref={regionInputRef}
                 onChange={(e) => setRegion(e.target.value)}
                 placeholder="Enter city or area name (e.g., New York, Paris)"
                 className={styles.input}
@@ -336,57 +384,44 @@ export default function Preferences() {
                 onChange={(e) => setSearchRadius(Number(e.target.value))}
                 className={styles.rangeInput}
               />
-              <div style={{ fontSize: '12px', color: '#f59e0b', marginTop: '4px', fontWeight: '500' }}>
-                ⚠️ Maximum 15 places shown to reduce API costs
-              </div>
             </div>
           </div>
 
-          {searchLoading && (
-            <div style={{ 
-              padding: '12px', 
-              backgroundColor: '#dbeafe', 
-              border: '1px solid #3b82f6', 
-              borderRadius: '8px', 
-              color: '#1e40af',
-              textAlign: 'center',
-              margin: '16px 0'
-            }}>
-              🔍 Searching for places... Please wait.
-            </div>
-          )}
 
-          {searchError && (
-            <div style={{ 
-              padding: '12px', 
-              backgroundColor: '#fef2f2', 
-              border: '1px solid #ef4444', 
-              borderRadius: '8px', 
-              color: '#dc2626',
-              textAlign: 'center',
-              margin: '16px 0'
-            }}>
-              ❌ Search Error: {searchError}
-            </div>
-          )}
+          <div className={`${styles.errorMessage_container_for_empty_search} ${showError ? styles.show : styles.hide}`}>
+            {searchError === null ? null :
+              <p className={styles.errorMessage}>
+                ❌ Search Error: {searchError}
+              </p>
+            }
+          </div>
 
-          {showSuccess && (
-            <div className={styles.successMessage}>
-              ✅ Preferences saved and places searched successfully! Found {places.length} places.
-            </div>
-          )}
+
+
+          <div className={`${styles.errorMessage_container} ${showError ? styles.show : styles.hide}`}>
+            {showSuccess && places.length > 0 && (
+              <div className={styles.loading_cont}>
+                <SyncLoader color="#10b981" size={8} margin={4} />
+              </div>
+            )}
+          </div>
+
+
+
 
           <div className={styles.actions}>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={`${styles.actionBtn} ${styles.saveBtn}`}
               disabled={searchLoading || !isLoaded}
             >
-              {searchLoading ? '🔍 Searching...' : '💾 Save & Search'}
+              {searchLoading && places.length > 0 ? '🔍 Searching...' : '💾 Save & Search'}
             </button>
-            <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
-              🗺️ Go to Map
-            </Link>
+            {!searchLoading && places.length > 0 && !showSuccess && (
+              <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
+                🗺️ Go to Map. ( places found {places.length} )
+              </Link>
+            )}
           </div>
         </form>
       </div>

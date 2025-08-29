@@ -41,6 +41,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const [hasMounted, setHasMounted] = useState(false)
+
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  if (!hasMounted) {
+    return null
+  }
+
   const login = async (username: string, password: string) => {
     setLoading(true)
     try {

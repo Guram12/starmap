@@ -237,7 +237,7 @@ export function usePlacesSearch() {
     });
   }, []); // Remove dependencies since we're using refs
 
-  return { places, loading, error, searchPlaces, geocodeLocation };
+  return { places, loading, error, setError, searchPlaces, geocodeLocation };
 }
 
 // This hook is now used only from the preferences page for searching

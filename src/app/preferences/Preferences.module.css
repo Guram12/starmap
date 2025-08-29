@@ -203,15 +203,70 @@
   box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
 }
 
-.successMessage {
-  background: #d1fae5;
-  border: 1px solid #10b981;
-  color: #065f46;
-  padding: 5px 10px 5px 10px;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 500;
+/* =========================================  error container animation ======================== */
+@keyframes errorOpen {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  100% {
+    max-height: 200px;
+    opacity: 1;
+  }
 }
+
+@keyframes errorClose {
+  0% {
+    max-height: 200px;
+    opacity: 1;
+  }
+
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+.errorMessage_container_for_empty_search {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #1f2937;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.errorMessage_container_for_empty_search.show {
+  animation: errorOpen 0.5s forwards;
+}
+
+.errorMessage_container_for_empty_search.hide {
+  animation: errorClose 0.5s forwards;
+}
+
+/* ================================================================================= */
+.successMessage {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.successMessage.show {
+  max-height: 200px !important;
+  opacity: 1;
+}
+
+.loading_cont {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
 
 /* Responsive design */
 @media (max-width: 768px) {
