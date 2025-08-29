@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback , useRef } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
 import { useAuth } from '../AuthProvider';
 import SyncLoader from "react-spinners/SyncLoader";
+import { useSearchParams } from 'next/navigation';
 
 
 
@@ -222,6 +223,18 @@ export default function Preferences() {
     }
   }, [places]);
 
+  // ===================================================  focus region input ===================================================
+
+  const regionInputRef = useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('f') === 'region' && regionInputRef.current) {
+      regionInputRef.current.focus();
+    }
+  }, [searchParams]);
+
+
   // ===================================================  utility functions ===================================================
 
   const getPlaceTypeIcon = (type: PlaceType): string => {
@@ -265,6 +278,7 @@ export default function Preferences() {
                 id="region"
                 type="text"
                 value={region}
+                ref={regionInputRef}
                 onChange={(e) => setRegion(e.target.value)}
                 placeholder="Enter city or area name (e.g., New York, Paris)"
                 className={styles.input}
