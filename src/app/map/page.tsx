@@ -320,7 +320,7 @@ export default function MapPage() {
           <div className={styles.mapContainer}>
             <div className={styles.mapHeader}>
               <h3 className={styles.mapTitle}>
-                <MapPinned className={styles.mapIcon} /> Interactive Map
+                <MapPinned className={styles.mapIcon} /> Map
               </h3>
               <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
                 {preferences.region ? `Showing results for ${preferences.region}` : 'Set region in preferences'}

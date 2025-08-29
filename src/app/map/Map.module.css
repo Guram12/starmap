@@ -293,42 +293,31 @@
 }
 
 .placesList::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  /* Light gray track */
+  background: transparent;
+  /* Make track transparent */
   border-radius: 10px;
 }
 
 .placesList::-webkit-scrollbar-thumb {
-  background: #ffffff;
-  /* White thumb */
+  background: rgba(255, 255, 255, 0.7);
+  /* Semi-transparent white thumb */
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  /* Subtle border for visibility */
+  border: 1px solid rgba(26, 86, 165, 0.3);
+  /* Semi-transparent border */
 }
 
 .placesList::-webkit-scrollbar-thumb:hover {
-  background: #f8fafc;
-  /* Slightly darker on hover */
-  border: 1px solid #cbd5e1;
+  background: #000;
+  border: 1px solid #000;
 }
 
-/* Alternative: Even thinner scrollbar */
-.placesList::-webkit-scrollbar {
-  width: 4px;
-  /* Ultra-thin scrollbar */
+/* For Firefox */
+.placesList {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.7) transparent;
+  /* thumb color and transparent track */
 }
 
-.placesList::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.8);
-  /* Semi-transparent white */
-  border-radius: 2px;
-  border: none;
-}
-
-.placesList::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 1);
-  /* Solid white on hover */
-}
 
 @keyframes spin {
   to {
