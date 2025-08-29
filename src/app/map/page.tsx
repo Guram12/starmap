@@ -15,12 +15,12 @@ interface Place {
   formattedAddress?: string | null;
   location: google.maps.LatLng;
   photos?: google.maps.places.PlacePhoto[];
+  photoUrl?: string | null;
   types?: string[];
   priceLevel?: google.maps.places.PriceLevel | null;
   websiteURI?: string | null;
   nationalPhoneNumber?: string | null;
 }
-
 interface Preferences {
   region: string;
   placeType: string;
@@ -37,7 +37,7 @@ export default function MapPage() {
   });
   const [places, setPlaces] = useState<Place[]>([]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
   const [isFromHistory, setIsFromHistory] = useState(false);
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
@@ -79,6 +79,7 @@ export default function MapPage() {
         rating?: number | null;
         formattedAddress?: string | null;
         location: { lat: number; lng: number };
+        photoUrl?: string | null; // Add this
         types?: string[];
         priceLevel?: number | null;
         websiteURI?: string | null;
@@ -87,6 +88,8 @@ export default function MapPage() {
         ...place,
         location: new google.maps.LatLng(place.location.lat, place.location.lng)
       }));
+
+
       setPlaces(placesWithLatLng);
       console.log('✅ MAP PAGE: Loaded search results from localStorage:', {
         count: placesWithLatLng.length,
@@ -133,6 +136,10 @@ export default function MapPage() {
           priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
           websiteURI: place.websiteURI ?? null,
           nationalPhoneNumber: place.nationalPhoneNumber ?? null,
+          // Add photo URL extraction
+          photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
+            ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
+            : place.photoUrl ?? null // Use existing photoUrl if available
         }))
       });
     } else if (isFromHistory) {
@@ -143,41 +150,62 @@ export default function MapPage() {
   }, [places, preferences, isAuthenticated, saveSearchToHistory, isFromHistory]);
 
 
+
   // =========================================  Update markers when places change  =============================================
   useEffect(() => {
-    if (!map || !places.length) {
-      // Clear existing markers if no places
-      markers.forEach(marker => marker.setMap(null));
+    if (!map || !places.length || !window.google?.maps?.marker?.AdvancedMarkerElement) {
+      // Clear existing markers if no places or Advanced Markers not loaded
+      markers.forEach(marker => {
+        if (marker.map) {
+          marker.map = null;
+        }
+      });
       setMarkers([]);
       return;
     }
 
     // Clear existing markers
-    markers.forEach(marker => marker.setMap(null));
+    markers.forEach(marker => {
+      if (marker.map) {
+        marker.map = null;
+      }
+    });
 
-    // Create new markers using legacy Marker API (cheaper)
+    // Create new markers using Advanced Markers API
     const newMarkers = places.map(place => {
-      const marker = new google.maps.Marker({
+      // Create custom marker element
+      const markerElement = document.createElement('div');
+      markerElement.innerHTML = `
+      <div style="
+        background: #1f2937;
+        color: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      ">
+        ${getMarkerIcon(preferences.placeType)}
+      </div>
+    `;
+
+      const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
         position: place.location,
         title: place.displayName,
-        icon: {
-          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#1f2937"/>
-              <text x="12" y="16" text-anchor="middle" fill="white" font-size="12">${getMarkerIcon(preferences.placeType)}</text>
-            </svg>`
-          )}`,
-          scaledSize: new google.maps.Size(32, 32),
-        }
+        content: markerElement
       });
 
-      // Add info window with minimal content
+      // Add info window with image support
       const infoWindow = new google.maps.InfoWindow({
         content: createInfoWindowContent(place)
       });
 
-      marker.addListener('click', () => {
+      markerElement.addEventListener('click', () => {
         infoWindow.open(map, marker);
       });
 
@@ -188,10 +216,13 @@ export default function MapPage() {
 
     // Cleanup function to remove markers when component unmounts or places change
     return () => {
-      newMarkers.forEach(marker => marker.setMap(null));
+      newMarkers.forEach(marker => {
+        if (marker.map) {
+          marker.map = null;
+        }
+      });
     };
-  }, [map, places, preferences.placeType]); // Remove 'markers' from dependencies to prevent infinite loop
-
+  }, [map, places, preferences.placeType]);
 
   // ==============================================    set marker icon   ==================================================
 
@@ -209,24 +240,44 @@ export default function MapPage() {
 
   // ========================================    Create info window content   ==================================================   
 
-  const createInfoWindowContent = (place: {
-    displayName: string;
-    rating?: number | null;
-    formattedAddress?: string | null;
-  }): string => {
-    // Simplified info window - no photos or expensive data
-    return `
-      <div style="max-width: 200px; padding: 8px;">
-        <h3 style="margin: 0 0 4px 0; font-size: 14px; color: #1f2937;">${place.displayName}</h3>
-        <div style="display: flex; align-items: center; margin-bottom: 4px;">
-          <span style="color: #fbbf24; margin-right: 4px;">⭐</span>
-          <span style="font-weight: 600; color: #374151;">${place.rating || 'N/A'}</span>
-        </div>
-        <p style="margin: 0; color: #6b7280; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+const createInfoWindowContent = (place: Place): string => {
+  const photoUrl = place.photoUrl;
+  return `
+    <div style="
+      max-width: 220px;
+      padding: 10px;
+      background: #059669;
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-family: 'Inter', sans-serif;
+    ">
+      ${photoUrl ? `
+        <img 
+          src="${photoUrl}" 
+          alt="${place.displayName}"
+          style="
+            width: 100%; 
+            height: 120px; 
+            object-fit: cover; 
+            border-radius: 6px; 
+            margin-bottom: 8px;
+          "
+        />
+      ` : ''}
+      <h3 style="margin: 0 0 4px 0; font-size: 15px;">${place.displayName}</h3>
+      <div style="margin-bottom: 4px;">
+        <span style="color: #fbbf24;">⭐</span>
+        <span style="font-weight: 600;">${place.rating || 'N/A'}</span>
       </div>
-    `;
-  };
+      <p style="margin: 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+    </div>
+  `;
+};
 
+  useEffect(() => {
+    console.log('places ===>>>> ', places)
+  }, [places]);
 
   // =====================================================================================================================
   if (!prefsLoaded) {

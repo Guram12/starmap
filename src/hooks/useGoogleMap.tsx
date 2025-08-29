@@ -18,7 +18,7 @@ export function useGoogleMap(options: MapOptions = {}) {
         const loader = new Loader({
           apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
           version: 'weekly',
-          libraries: ['places', 'geometry']
+          libraries: ['places', 'geometry', 'marker']
         });
 
         const { Map } = await loader.importLibrary('maps') as google.maps.MapsLibrary;
@@ -27,6 +27,7 @@ export function useGoogleMap(options: MapOptions = {}) {
           const mapInstance = new Map(mapRef.current, {
             center: options.center || { lat: 40.7128, lng: -74.0060 },
             zoom: options.zoom || 12,
+            mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,
             mapTypeControl: true,
             streetViewControl: true,
             fullscreenControl: true,
@@ -34,11 +35,11 @@ export function useGoogleMap(options: MapOptions = {}) {
           });
 
           setMap(mapInstance);
-          
+
           // Ensure Google Maps is fully loaded before setting isLoaded
           await new Promise(resolve => setTimeout(resolve, 100));
           setIsLoaded(true);
-          
+
           console.log('✅ Google Maps API fully loaded and ready');
         }
       } catch (err) {

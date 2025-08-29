@@ -181,6 +181,10 @@ export default function Preferences() {
             priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
             websiteURI: place.websiteURI ?? null,
             nationalPhoneNumber: place.nationalPhoneNumber ?? null,
+            // Add photo URL extraction
+            photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
+              ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
+              : null
           }))
         }),
       });
@@ -201,7 +205,17 @@ export default function Preferences() {
   useEffect(() => {
     if (places && places.length > 0) {
       const searchResults = {
-        places,
+        places: places.map(place => ({
+          ...place,
+          location: {
+            lat: place.location.lat(),
+            lng: place.location.lng()
+          },
+          // Extract photo URL here
+          photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
+            ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
+            : null
+        })),
         searchParams: { region, placeType, minStars, searchRadius },
         timestamp: new Date().toISOString(),
         fromHistory: false // Mark as fresh search

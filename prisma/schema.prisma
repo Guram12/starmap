@@ -57,6 +57,7 @@ model SearchPlace {
   priceLevel       Int?
   websiteURI       String?
   phoneNumber      String?
+  photoUrl         String? // Add this field to store the first photo URL
 
   // Relation to SearchHistory
   searchHistory SearchHistory @relation(fields: [searchHistoryId], references: [id], onDelete: Cascade)

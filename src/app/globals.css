@@ -86,6 +86,40 @@ body::-webkit-scrollbar-thumb {
 }
 
 
+/* ============================================================================= */
+/* 059669 */
+/* Main container */
+.gm-style-iw {
+  background-color:white !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  border-radius: 12px !important;
+  padding: 0 !important; /* let inner content handle padding */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  max-width: 320px !important; /* control width */
+}
+
+/* Inner wrapper (this is where scrollbar comes from) */
+.gm-style-iw-d {
+  overflow: hidden !important;   /* remove scrollbars */
+  max-height: none !important;   /* allow full height */
+}
+
+/* Optional: adjust the close button */
+.gm-ui-hover-effect {
+  top: 1px !important;
+  right: 8px !important;
+  border-radius: 50% !important;
+  background:white!important;
+  color: white !important;
+
+}
+.gm-ui-hover-effect span {
+  filter: invert(1) !important; /* make "X" white */
+  color: white !important;
+}
+
 
 
 @media (prefers-color-scheme: dark) {
