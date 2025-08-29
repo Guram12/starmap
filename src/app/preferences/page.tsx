@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback , useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
@@ -24,7 +24,7 @@ export default function Preferences() {
   const [locationLoading, setLocationLoading] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const { mapRef, map, isLoaded } = useGoogleMap();
-  const { places, error: searchError, searchPlaces, geocodeLocation } = usePlacesSearch();
+  const { places, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
   const { isAuthenticated } = useAuth();
 
 
@@ -124,7 +124,7 @@ export default function Preferences() {
 
           console.log('✅ PREFERENCES: Search completed, storing results');
         } else {
-          throw new Error('Could not find the specified location');
+          setError('Could not find the specified location');
         }
       } else {
         throw new Error('Map not ready for search');
@@ -247,6 +247,21 @@ export default function Preferences() {
     };
     return icons[type] || '📍';
   };
+
+  const [showError, setShowError] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    if (searchError) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setError(null);
+        setTimeout(() => setShowError(false), 500);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchError]);
+
 
   // ==========================================================================================================================
 
@@ -373,22 +388,17 @@ export default function Preferences() {
           </div>
 
 
-          {searchError && (
-            <div style={{
-              padding: '12px',
-              backgroundColor: '#fef2f2',
-              border: '1px solid #ef4444',
-              borderRadius: '8px',
-              color: '#dc2626',
-              textAlign: 'center',
-              margin: '16px 0'
-            }}>
-              ❌ Search Error: {searchError}
-            </div>
-          )}
+          <div className={`${styles.errorMessage_container_for_empty_search} ${showError ? styles.show : styles.hide}`}>
+            {searchError === null ? null :
+              <p className={styles.errorMessage}>
+                ❌ Search Error: {searchError}
+              </p>
+            }
+          </div>
 
 
-          <div className={`${styles.successMessage} ${showSuccess && places.length > 0 ? styles.show : ''}`}>
+
+          <div className={`${styles.errorMessage_container} ${showError ? styles.show : styles.hide}`}>
             {showSuccess && places.length > 0 && (
               <div className={styles.loading_cont}>
                 <SyncLoader color="#10b981" size={8} margin={4} />
@@ -405,9 +415,9 @@ export default function Preferences() {
               className={`${styles.actionBtn} ${styles.saveBtn}`}
               disabled={searchLoading || !isLoaded}
             >
-              {searchLoading ? '🔍 Searching...' : '💾 Save & Search'}
+              {searchLoading && places.length > 0 ? '🔍 Searching...' : '💾 Save & Search'}
             </button>
-            {!searchLoading && places.length > 0 && (
+            {!searchLoading && places.length > 0 && !showSuccess && (
               <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
                 🗺️ Go to Map. ( places found {places.length} )
               </Link>
