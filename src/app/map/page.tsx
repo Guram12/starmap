@@ -152,43 +152,38 @@ export default function MapPage() {
 
 
   // =========================================  Update markers when places change  =============================================
+  const [markerInfoPairs, setMarkerInfoPairs] = useState<
+    { marker: google.maps.marker.AdvancedMarkerElement; infoWindow: google.maps.InfoWindow }[]
+  >([]);
+
   useEffect(() => {
     if (!map || !places.length || !window.google?.maps?.marker?.AdvancedMarkerElement) {
-      // Clear existing markers if no places or Advanced Markers not loaded
-      markers.forEach(marker => {
-        if (marker.map) {
-          marker.map = null;
-        }
+      markerInfoPairs.forEach(({ marker }) => {
+        if (marker.map) marker.map = null;
       });
-      setMarkers([]);
+      setMarkerInfoPairs([]);
       return;
     }
 
-    // Clear existing markers
-    markers.forEach(marker => {
-      if (marker.map) {
-        marker.map = null;
-      }
+    markerInfoPairs.forEach(({ marker }) => {
+      if (marker.map) marker.map = null;
     });
 
-    // Create new markers using Advanced Markers API
-    const newMarkers = places.map(place => {
-      // Create custom marker element
+    const newPairs = places.map(place => {
       const markerElement = document.createElement('div');
       markerElement.innerHTML = `
-      <div style="
-        background: #1f2937;
-        color: white;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      ">
+      <div 
+      style="background: #1f2937;
+             color: white;
+             border-radius: 50%;
+             width: 32px;
+             height: 32px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 16px;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
         ${getMarkerIcon(preferences.placeType)}
       </div>
     `;
@@ -208,18 +203,14 @@ export default function MapPage() {
       markerElement.addEventListener('click', () => {
         infoWindow.open(map, marker);
       });
-
-      return marker;
+      return { marker, infoWindow };
     });
 
-    setMarkers(newMarkers);
+    setMarkerInfoPairs(newPairs);
 
-    // Cleanup function to remove markers when component unmounts or places change
     return () => {
-      newMarkers.forEach(marker => {
-        if (marker.map) {
-          marker.map = null;
-        }
+      newPairs.forEach(({ marker }) => {
+        if (marker.map) marker.map = null;
       });
     };
   }, [map, places, preferences.placeType]);
@@ -240,9 +231,9 @@ export default function MapPage() {
 
   // ========================================    Create info window content   ==================================================   
 
-const createInfoWindowContent = (place: Place): string => {
-  const photoUrl = place.photoUrl;
-  return `
+  const createInfoWindowContent = (place: Place): string => {
+    const photoUrl = place.photoUrl;
+    return `
     <div style="
       max-width: 220px;
       padding: 10px;
@@ -273,11 +264,12 @@ const createInfoWindowContent = (place: Place): string => {
       <p style="margin: 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
     </div>
   `;
-};
+  };
 
   useEffect(() => {
     console.log('places ===>>>> ', places)
   }, [places]);
+
 
   // =====================================================================================================================
   if (!prefsLoaded) {
@@ -373,8 +365,17 @@ const createInfoWindowContent = (place: Place): string => {
 
               {places.length > 0 && (
                 <div className={styles.placesList}>
-                  {places.map((place) => (
-                    <div key={place.id} className={styles.placeItem}>
+                  {places.map((place, idx) => (
+                    <div
+                      key={place.id}
+                      className={styles.placeItem}
+                      onClick={() => {
+                        if (markerInfoPairs[idx]) {
+                          markerInfoPairs[idx].infoWindow.open(map, markerInfoPairs[idx].marker);
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <div className={styles.placeName}>{place.displayName}</div>
                       <div className={styles.placeRating}>⭐ {place.rating || 'N/A'}</div>
                     </div>
