@@ -8,6 +8,8 @@ import { useGoogleMap } from '../../hooks/useGoogleMap';
 import { useAuth } from '../AuthProvider';
 import SyncLoader from "react-spinners/SyncLoader";
 import { useSearchParams } from 'next/navigation';
+import { gsap } from 'gsap';
+import { FaLocationCrosshairs } from "react-icons/fa6";
 
 
 
@@ -181,6 +183,10 @@ export default function Preferences() {
             priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
             websiteURI: place.websiteURI ?? null,
             nationalPhoneNumber: place.nationalPhoneNumber ?? null,
+            // Add photo URL extraction
+            photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
+              ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
+              : null
           }))
         }),
       });
@@ -201,7 +207,17 @@ export default function Preferences() {
   useEffect(() => {
     if (places && places.length > 0) {
       const searchResults = {
-        places,
+        places: places.map(place => ({
+          ...place,
+          location: {
+            lat: place.location.lat(),
+            lng: place.location.lng()
+          },
+          // Extract photo URL here
+          photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
+            ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
+            : null
+        })),
         searchParams: { region, placeType, minStars, searchRadius },
         timestamp: new Date().toISOString(),
         fromHistory: false // Mark as fresh search
@@ -262,12 +278,55 @@ export default function Preferences() {
     }
   }, [searchError]);
 
+  // =============================== change background color when  search finishes =====================================
+
+  const backgroundRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!searchLoading && places.length > 0) {
+      const timer = setTimeout(() => {
+        if (backgroundRef.current) {
+          gsap.to(backgroundRef.current, {
+            duration: 3,
+            background: '#10b981',
+            ease: "power2.inOut"
+          });
+        }
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+
+  }, [searchLoading, places.length]);
+
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (backgroundRef.current) {
+        gsap.to(backgroundRef.current, {
+          duration: 3,
+          background: '#667eea',
+          ease: "power2.inOut"
+        });
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+
+  }, [region, placeType, minStars, searchRadius])
+
+
 
   // ==========================================================================================================================
 
 
+
   return (
-    <div className={styles.preferencesPage}>
+    <div
+      ref={backgroundRef}
+      className={styles.preferencesPage}
+    >
       <div className={styles.container}>
         {/* Hidden map for search functionality */}
         <div style={{ display: 'none' }}>
@@ -300,21 +359,22 @@ export default function Preferences() {
                 style={{ flex: 1 }}
                 required
               />
-              <button
-                type="button"
+              <div
                 onClick={getCurrentLocation}
-                disabled={locationLoading}
-                className={`${styles.actionBtn}`}
+                className={styles.set_current_location_div}
                 style={{
-                  minWidth: '120px',
-                  fontSize: '12px',
-                  padding: '8px 12px',
-                  backgroundColor: locationLoading ? '#9ca3af' : '#059669',
                   cursor: locationLoading ? 'not-allowed' : 'pointer'
                 }}
               >
-                {locationLoading ? '🔄 Getting...' : '📍 Use Current'}
-              </button>
+                <FaLocationCrosshairs
+                  style={{
+                    marginRight: '4px',
+                    color: 'black',
+                    width: '30px',
+                    height: '30px'
+                  }}
+                />
+              </div>
             </div>
             <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
               💡 You can type a location or use your current position

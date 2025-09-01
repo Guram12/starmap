@@ -1,6 +1,6 @@
 .preferencesPage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,6 +149,28 @@
   margin-top: 1rem;
   justify-content: center;
 }
+
+.set_current_location_div {
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 40px;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.set_current_location_div:hover {
+  transform: scale(1.05);
+}
+
 
 .actionBtn {
   padding: 0.875rem 1.5rem;

@@ -51,16 +51,19 @@ a {
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 *::-webkit-scrollbar {
-  width: 4px; /* Ultra-thin scrollbar */
+  width: 4px;
+  /* Ultra-thin scrollbar */
 }
 
 *::-webkit-scrollbar-track {
-  background: #326191; /* Light gray track */
+  background: #326191;
+  /* Light gray track */
   border-radius: 2px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  background: rgba(255, 255, 255, 0.8);
+  /* Semi-transparent white */
   border-radius: 2px;
   border: none;
 }
@@ -68,7 +71,8 @@ a {
 
 /* Specific elements that might need different styling */
 body::-webkit-scrollbar {
-  width: 8px; /* Slightly wider for main page scrollbar */
+  width: 8px;
+  /* Slightly wider for main page scrollbar */
 }
 
 body::-webkit-scrollbar-thumb {
@@ -78,13 +82,61 @@ body::-webkit-scrollbar-thumb {
 
 /* For dark backgrounds, you might want different colors */
 .dark-theme *::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.8); /* Darker thumb for dark themes */
+  background: rgba(100, 116, 139, 0.8);
+  /* Darker thumb for dark themes */
 }
 
 .dark-theme *::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.5); /* Darker track for dark themes */
+  background: rgba(30, 41, 59, 0.5);
+  /* Darker track for dark themes */
 }
 
+
+/* ============================================================================= */
+/* 059669 */
+/* Main container */
+.gm-style-iw {
+  background-color: white !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3);
+  border-radius: 12px !important;
+  padding: 0 !important;
+  /* let inner content handle padding */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  max-width: 320px !important;
+  /* control width */
+}
+
+/* Inner wrapper (this is where scrollbar comes from) */
+.gm-style-iw-d {
+  overflow: hidden !important;
+  /* remove scrollbars */
+  max-height: none !important;
+  /* allow full height */
+}
+
+/* Optional: adjust the close button */
+.gm-ui-hover-effect {
+  top: 1px !important;
+  right: 8px !important;
+  border-radius: 50% !important;
+  background: white !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  margin-bottom: 5px !important;
+}
+
+.gm-ui-hover-effect span {
+  filter: invert(1) !important;
+  /* make "X" white */
+  color: white !important;
+  margin: 0px !important;
+}
 
 
 
@@ -93,6 +145,3 @@ body::-webkit-scrollbar-thumb {
     color-scheme: dark;
   }
 }
-
-
-
