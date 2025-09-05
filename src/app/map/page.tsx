@@ -37,8 +37,12 @@ export default function MapPage() {
   });
   const [places, setPlaces] = useState<Place[]>([]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
-  const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
   const [isFromHistory, setIsFromHistory] = useState(false);
+
+  const [markerInfoPairs, setMarkerInfoPairs] = useState<{
+    marker: google.maps.marker.AdvancedMarkerElement;
+    infoWindow: google.maps.InfoWindow;
+  }[]>([]);
 
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
   const { saveSearchToHistory } = useSearchHistory();
@@ -152,9 +156,7 @@ export default function MapPage() {
 
 
   // =========================================  Update markers when places change  =============================================
-  const [markerInfoPairs, setMarkerInfoPairs] = useState<
-    { marker: google.maps.marker.AdvancedMarkerElement; infoWindow: google.maps.InfoWindow }[]
-  >([]);
+
 
   useEffect(() => {
     if (!map || !places.length || !window.google?.maps?.marker?.AdvancedMarkerElement) {
