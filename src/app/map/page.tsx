@@ -248,9 +248,12 @@ export default function MapPage() {
   };
 
   // ========================================    Create info window content   ==================================================   
-
   const createInfoWindowContent = (place: Place): string => {
     const photoUrl = place.photoUrl;
+    const lat = place.location.lat();
+    const lng = place.location.lng();
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${place.id}`;
+
     return `
     <div style="
       max-width: 220px;
@@ -279,7 +282,26 @@ export default function MapPage() {
         <span style="color: #fbbf24;">⭐</span>
         <span style="font-weight: 600;">${place.rating || 'N/A'}</span>
       </div>
-      <p style="margin: 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+      <p style="margin: 0 0 8px 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+      <button 
+        onclick="window.open('${googleMapsUrl}', '_blank')"
+        style="
+          background: #ffffff;
+          color: #059669;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          width: 100%;
+          transition: all 0.2s;
+        "
+        onmouseover="this.style.background='#f3f4f6'"
+        onmouseout="this.style.background='#ffffff'"
+      >
+        🗺️ Open in Google Maps
+      </button>
     </div>
   `;
   };
