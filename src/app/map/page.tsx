@@ -411,7 +411,7 @@ export default function MapPage() {
                   width: '100%',
                   height: '100%',
                   borderRadius: '12px',
-                  backgroundColor: '#20499B'
+                  backgroundColor: '#FFFFFF'
                 }}
               />
             )}
