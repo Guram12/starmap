@@ -149,6 +149,10 @@
   cursor: pointer;
 }
 
+.selectedPlace {
+  background-color: #FFFFFFB6 !important;
+}
+
 .settingItem {
   display: flex;
   justify-content: space-between;
