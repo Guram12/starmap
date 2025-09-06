@@ -34,8 +34,8 @@
   color: #000;
 }
 
-.setregion_button{
-  background:black;
+.setregion_button {
+  background: black;
   border: none;
   padding: 5px;
   border-radius: 8px;
@@ -44,7 +44,7 @@
   font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-    color: white;
+  color: white;
 }
 
 .setregion_button:hover {
@@ -149,6 +149,10 @@
   cursor: pointer;
 }
 
+.selectedPlace {
+  background-color: #FFFFFFB6 !important;
+}
+
 .settingItem {
   display: flex;
   justify-content: space-between;
@@ -246,6 +250,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 300px !important;
 }
 
 .mapHeader {
@@ -278,6 +283,9 @@
 
 .mapDiv {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-height: 280px;
+  height: auto;
 }
 
 .placeholderIcon {
@@ -400,4 +408,32 @@
     align-items: flex-start;
     gap: 0.25rem;
   }
+}
+
+/* =================================================    mobile styles   ===================================================== */
+
+  @media screen and (max-width: 480px) {
+  .container {
+    height: auto;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+    max-width: 400px;
+    margin-top: 80px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: 2rem;
+    height: 100%;
+  }
+
+
+
 }

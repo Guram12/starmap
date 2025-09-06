@@ -44,6 +44,11 @@ export default function MapPage() {
     infoWindow: google.maps.InfoWindow;
   }[]>([]);
 
+
+  const [selected_PlaceID_From_List, setSelected_PlaceID_From_List] = useState('');
+
+
+
   const { mapRef, map, isLoaded, error: mapError } = useGoogleMap();
   const { saveSearchToHistory } = useSearchHistory();
   const { isAuthenticated } = useAuth();
@@ -158,6 +163,7 @@ export default function MapPage() {
   // =========================================  Update markers when places change  =============================================
 
 
+
   useEffect(() => {
     if (!map || !places.length || !window.google?.maps?.marker?.AdvancedMarkerElement) {
       markerInfoPairs.forEach(({ marker }) => {
@@ -174,21 +180,21 @@ export default function MapPage() {
     const newPairs = places.map(place => {
       const markerElement = document.createElement('div');
       markerElement.innerHTML = `
-      <div 
-      style="background: #1f2937;
-             color: white;
-             border-radius: 50%;
-             width: 32px;
-             height: 32px;
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             font-size: 16px;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-        ${getMarkerIcon(preferences.placeType)}
-      </div>
-    `;
+    <div 
+    style="background: #1f2937;
+           color: white;
+           border-radius: 50%;
+           width: 32px;
+           height: 32px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+      ${getMarkerIcon(preferences.placeType)}
+    </div>
+  `;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
@@ -203,7 +209,16 @@ export default function MapPage() {
       });
 
       markerElement.addEventListener('click', () => {
+        // Close all info windows first
+        markerInfoPairs.forEach(({ infoWindow: otherInfoWindow }) => {
+          otherInfoWindow.close();
+        });
+
+        // Open this info window
         infoWindow.open(map, marker);
+
+        // Update selected place ID
+        setSelected_PlaceID_From_List(place.id);
       });
       return { marker, infoWindow };
     });
@@ -216,6 +231,7 @@ export default function MapPage() {
       });
     };
   }, [map, places, preferences.placeType]);
+
 
   // ==============================================    set marker icon   ==================================================
 
@@ -232,9 +248,12 @@ export default function MapPage() {
   };
 
   // ========================================    Create info window content   ==================================================   
-
   const createInfoWindowContent = (place: Place): string => {
     const photoUrl = place.photoUrl;
+    const lat = place.location.lat();
+    const lng = place.location.lng();
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${place.id}`;
+
     return `
     <div style="
       max-width: 220px;
@@ -263,7 +282,26 @@ export default function MapPage() {
         <span style="color: #fbbf24;">⭐</span>
         <span style="font-weight: 600;">${place.rating || 'N/A'}</span>
       </div>
-      <p style="margin: 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+      <p style="margin: 0 0 8px 0; font-size: 12px;">${place.formattedAddress || 'Address not available'}</p>
+      <button 
+        onclick="window.open('${googleMapsUrl}', '_blank')"
+        style="
+          background: #ffffff;
+          color: #059669;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          width: 100%;
+          transition: all 0.2s;
+        "
+        onmouseover="this.style.background='#f3f4f6'"
+        onmouseout="this.style.background='#ffffff'"
+      >
+        🗺️ Open in Google Maps
+      </button>
     </div>
   `;
   };
@@ -272,6 +310,30 @@ export default function MapPage() {
     console.log('places ===>>>> ', places)
   }, [places]);
 
+
+
+  const handlePlaceClickOnList = (placeId: string) => {
+    setSelected_PlaceID_From_List(placeId);
+    // Close all info windows first
+    markerInfoPairs.forEach(({ infoWindow }) => {
+      infoWindow.close();
+    });
+
+    // Find the place by ID to get its index
+    const placeIndex = places.findIndex(place => place.id === placeId);
+
+    if (placeIndex !== -1 && markerInfoPairs[placeIndex]) {
+      const pair = markerInfoPairs[placeIndex];
+      pair.infoWindow.open(map, pair.marker);
+      map?.panTo(pair.marker.position as google.maps.LatLng);
+      map?.setZoom(14);
+    }
+
+    if (window.innerWidth < 480 && map) {
+      window.scrollY = map.getDiv().offsetTop;
+      window.scrollTo({ top: window.scrollY, behavior: 'smooth' });
+    }
+  };
 
   // =====================================================================================================================
   if (!prefsLoaded) {
@@ -370,12 +432,8 @@ export default function MapPage() {
                   {places.map((place, idx) => (
                     <div
                       key={place.id}
-                      className={styles.placeItem}
-                      onClick={() => {
-                        if (markerInfoPairs[idx]) {
-                          markerInfoPairs[idx].infoWindow.open(map, markerInfoPairs[idx].marker);
-                        }
-                      }}
+                      className={`${styles.placeItem} ${selected_PlaceID_From_List === place.id ? styles.selectedPlace : ''}`}
+                      onClick={() => handlePlaceClickOnList(place.id)}
                       style={{ cursor: 'pointer' }}
                     >
                       <div className={styles.placeName}>{place.displayName}</div>
@@ -411,7 +469,7 @@ export default function MapPage() {
                   width: '100%',
                   height: '100%',
                   borderRadius: '12px',
-                  backgroundColor: '#20499B'
+                  backgroundColor: '#FFFFFF'
                 }}
               />
             )}
