@@ -328,6 +328,11 @@ export default function MapPage() {
       map?.panTo(pair.marker.position as google.maps.LatLng);
       map?.setZoom(14);
     }
+
+    if (window.innerWidth < 480 && map) {
+      window.scrollY = map.getDiv().offsetTop;
+      window.scrollTo({ top: window.scrollY, behavior: 'smooth' });
+    }
   };
 
   // =====================================================================================================================
