@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/AuthProvider'
@@ -17,6 +17,11 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { login } = useAuth() // Get login function from context
+
+
+useEffect(()=> {
+  console.log('loading:', loading)
+}, [loading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +54,7 @@ export default function Register() {
         if (data.autoLogin && data.user) {
           // Update auth context
           await login(formData.username, formData.password)
-          // Redirect to map or home
+
           router.push('/map?welcome=true') // Optional welcome parameter
         } else {
           // Fallback: redirect to login
