@@ -13,16 +13,25 @@ import useIsMobile from '@/hooks/useIsMobile';
 
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
-
+  const [scrolled, setScrolled] = useState<boolean>(false);
   const { user, isAuthenticated, logout, loading } = useAuth();
   const pathname = usePathname();
   const navRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
+
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const isMobile = useIsMobile(768);
 
-  // Navigation items
+
+
+
+  const handlerBurgerMenuClick = () => {
+    setIsBurgerMenuOpen(!isBurgerMenuOpen);
+  }
+
+
+  // ================================================= Navigation items ====================================================
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/preferences', label: 'Preferences' },
@@ -30,6 +39,34 @@ export default function Header() {
     { href: '/history', label: 'History' },
 
   ];
+
+
+  const [burgerMenuItems, setBurgerMenuItems] = useState([
+    { href: '/', label: 'Home' },
+    { href: '/preferences', label: 'Preferences' },
+    { href: '/map', label: 'Map' },
+    { href: '/history', label: 'History' },
+  ]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setBurgerMenuItems([
+        { href: '/', label: 'Home' },
+        { href: '/preferences', label: 'Preferences' },
+        { href: '/map', label: 'Map' },
+        { href: '/history', label: 'History' },
+        { href: '/auth/login', label: 'Login' },
+        { href: '/auth/register', label: 'Register' },
+      ]);
+    } else {
+      setBurgerMenuItems([
+        { href: '/', label: 'Home' },
+        { href: '/preferences', label: 'Preferences' },
+        { href: '/map', label: 'Map' },
+        { href: '/history', label: 'History' },
+      ]);
+    }
+  }, [isAuthenticated]);
 
 
   // ================================================== scroll effect ======================================================
@@ -51,9 +88,6 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
-
-
-
 
 
 
@@ -85,15 +119,15 @@ export default function Header() {
     // Update on window resize
     window.addEventListener('resize', updateIndicator);
     return () => window.removeEventListener('resize', updateIndicator);
-  }, [pathname, isAuthenticated]); // Add isAuthenticated dependency
-
-
-  useEffect(() => {
-    console.log('isMobile:', isMobile)
-  }, [isMobile])
+  }, [pathname, isAuthenticated]);
 
 
 
+
+
+
+
+  // ================================================== JSX ======================================================
   return (
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.container}>
@@ -117,53 +151,72 @@ export default function Header() {
                     height: '30px',
                     fontSize: '24px',
                   }}
+                  onClick={handlerBurgerMenuClick}
                 />
+
+                {!isBurgerMenuOpen && (
+                  <div className={styles.burgerMenu}>
+                    <div className={styles.navItemsMobile}>
+                      {burgerMenuItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+                          data-path={item.href}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </>
+
             ) : (
-              <>
-                <div className={styles.navItems}>
-                  {navItems.map((item) => (
+              <div className={styles.navItems}>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+                    data-path={item.href}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+
+                {/* Auth buttons with data-path for indicator */}
+                {!isAuthenticated && (
+                  <>
                     <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
-                      data-path={item.href}
+                      href="/auth/login"
+                      className={`${styles.navLink} ${pathname === '/auth/login' ? styles.active : ''}`}
+                      data-path="/auth/login"
                     >
-                      {item.label}
+                      Login
                     </Link>
-                  ))}
+                    <Link
+                      href="/auth/register"
+                      className={`${styles.navLink} ${pathname === '/auth/register' ? styles.active : ''}`}
+                      data-path="/auth/register"
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
 
-                  {/* Auth buttons with data-path for indicator */}
-                  {!isAuthenticated && (
-                    <>
-                      <Link
-                        href="/auth/login"
-                        className={`${styles.navLink} ${pathname === '/auth/login' ? styles.active : ''}`}
-                        data-path="/auth/login"
-                      >
-                        Login
-                      </Link>
-                      <Link
-                        href="/auth/register"
-                        className={`${styles.navLink} ${pathname === '/auth/register' ? styles.active : ''}`}
-                        data-path="/auth/register"
-                      >
-                        Register
-                      </Link>
-                    </>
-                  )}
+                {/* Animated underline indicator */}
+                <div
+                  className={styles.indicator}
+                  style={{
+                    left: `${indicatorStyle.left}px`,
+                    width: `${indicatorStyle.width}px`,
+                    opacity: indicatorStyle.width > 0 ? 1 : 0, // Hide when width is 0
+                  }}
+                />
+              </div>
 
-                  {/* Animated underline indicator */}
-                  <div
-                    className={styles.indicator}
-                    style={{
-                      left: `${indicatorStyle.left}px`,
-                      width: `${indicatorStyle.width}px`,
-                      opacity: indicatorStyle.width > 0 ? 1 : 0, // Hide when width is 0
-                    }}
-                  />
-                </div>
-              </>
             )}
 
 
