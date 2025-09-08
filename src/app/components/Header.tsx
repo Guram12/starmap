@@ -10,6 +10,9 @@ import { BarLoader } from 'react-spinners';
 import Logo from './Logo';
 import { Menu } from 'lucide-react';
 import useIsMobile from '@/hooks/useIsMobile';
+import { motion } from 'framer-motion'
+
+
 
 
 export default function Header() {
@@ -155,7 +158,14 @@ export default function Header() {
                 />
 
                 {!isBurgerMenuOpen && (
-                  <div className={styles.burgerMenu}>
+                  <motion.div
+                    className={styles.burgerMenu}
+                    initial={{ opacity: 0, y: -20, x: '-50%' }}
+                    animate={{ opacity: 1, y: 0, x: '-50%' }}
+                    exit={{ opacity: 0, y: -20, x: '-50%' }}
+                    style={{ left: '50%' }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <div className={styles.navItemsMobile}>
                       {burgerMenuItems.map((item) => (
                         <Link
@@ -168,7 +178,7 @@ export default function Header() {
                         </Link>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
               </>
