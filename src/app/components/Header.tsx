@@ -8,7 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 import { LogOut } from 'lucide-react';
 import { BarLoader } from 'react-spinners';
 import Logo from './Logo';
-
+import { Menu } from 'lucide-react';
+import useIsMobile from '@/hooks/useIsMobile';
 
 
 export default function Header() {
@@ -16,6 +17,8 @@ export default function Header() {
   const pathname = usePathname();
   const navRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+
+  const isMobile = useIsMobile(768);
 
   // Navigation items
   const navItems = [
@@ -25,6 +28,9 @@ export default function Header() {
     { href: '/history', label: 'History' },
 
   ];
+
+
+
 
 
   // Update indicator position when pathname changes
@@ -57,6 +63,13 @@ export default function Header() {
     return () => window.removeEventListener('resize', updateIndicator);
   }, [pathname, isAuthenticated]); // Add isAuthenticated dependency
 
+
+  useEffect(() => {
+    console.log('isMobile:', isMobile)
+  }, [isMobile])
+
+
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -68,48 +81,68 @@ export default function Header() {
         </div>
 
         <nav className={styles.nav} ref={navRef}>
-          <div className={styles.navItems}>
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
-                data-path={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
 
-            {/* Auth buttons with data-path for indicator */}
-            {!isAuthenticated && (
+          {isMobile ?
+            (
               <>
-                <Link
-                  href="/auth/login"
-                  className={`${styles.navLink} ${pathname === '/auth/login' ? styles.active : ''}`}
-                  data-path="/auth/login"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className={`${styles.navLink} ${pathname === '/auth/register' ? styles.active : ''}`}
-                  data-path="/auth/register"
-                >
-                  Register
-                </Link>
+                <Menu 
+                  style={{
+                    cursor: 'pointer',
+                    color: '#000',
+                    width: '30px',
+                    height: '30px',
+                    fontSize: '24px',
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <div className={styles.navItems}>
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+                      data-path={item.href}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+
+                  {/* Auth buttons with data-path for indicator */}
+                  {!isAuthenticated && (
+                    <>
+                      <Link
+                        href="/auth/login"
+                        className={`${styles.navLink} ${pathname === '/auth/login' ? styles.active : ''}`}
+                        data-path="/auth/login"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className={`${styles.navLink} ${pathname === '/auth/register' ? styles.active : ''}`}
+                        data-path="/auth/register"
+                      >
+                        Register
+                      </Link>
+                    </>
+                  )}
+
+                  {/* Animated underline indicator */}
+                  <div
+                    className={styles.indicator}
+                    style={{
+                      left: `${indicatorStyle.left}px`,
+                      width: `${indicatorStyle.width}px`,
+                      opacity: indicatorStyle.width > 0 ? 1 : 0, // Hide when width is 0
+                    }}
+                  />
+                </div>
               </>
             )}
 
-            {/* Animated underline indicator */}
-            <div
-              className={styles.indicator}
-              style={{
-                left: `${indicatorStyle.left}px`,
-                width: `${indicatorStyle.width}px`,
-                opacity: indicatorStyle.width > 0 ? 1 : 0, // Hide when width is 0
-              }}
-            />
-          </div>
+
 
           {loading ? (
             <div className={styles.loadingSpinner}>

@@ -412,7 +412,7 @@
 
 /* =================================================    mobile styles   ===================================================== */
 
-  @media screen and (max-width: 480px) {
+@media screen and (max-width: 768px) {
   .container {
     height: auto;
   }
@@ -426,14 +426,37 @@
     margin-top: 80px;
   }
 
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+
   .content {
     display: flex;
     flex-direction: column-reverse;
+    align-items: center;
     width: 100%;
     gap: 2rem;
     height: 100%;
   }
 
+
+.mapContainer {
+  flex: 1;
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 300px !important;
+  width: 100% !important;
+}
 
 
 }
