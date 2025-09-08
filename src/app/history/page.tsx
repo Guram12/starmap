@@ -152,9 +152,6 @@ export default function HistoryPage() {
           <Link href="/preferences" className={`${styles.actionBtn} ${styles.preferencesBtn}`}>
             ⚙️ Preferences
           </Link>
-          <Link href="/" className={`${styles.actionBtn} ${styles.homeBtn}`}>
-            🏠 Home
-          </Link>
           {searchHistory.length > 0 && (
             <button
               onClick={handleClearHistory}

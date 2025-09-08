@@ -12,6 +12,12 @@
   height: 60px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   border-radius: 22px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+}
+
+.scrolled {
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
 }
 
 .container {
@@ -24,7 +30,7 @@
   width: 100%;
 }
 
-.logo_name_cont{
+.logo_name_cont {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -156,14 +162,70 @@
 
   .nav {
     gap: 15px;
+
   }
 
   .navItems {
     gap: 8px;
   }
 
-  .navLink {
+  .navLink_mobile {
     padding: 6px 12px;
-    font-size: 0.9rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: black;
   }
+
+
+
+  .burgerMenu {
+    position: absolute;
+    left: 50%;
+    background-color: white;
+    top: 70px;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    border-radius: 22px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: black;
+    max-width: 95%;
+    width: 95%;
+    min-width: 200px;
+    z-index: 100;
+  }
+
+  .navItemsMobile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .nav_button_with_icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: relative;
+    border: 1px solid rgb(38, 57, 77);
+    width: 100%;
+    padding: 5px 10px;
+    border-radius: 22px;
+    color: white;
+  }
+
+  .burgermenu_icons {
+    position: absolute;
+    left: 10px;
+    color: black;
+    width: 27px;
+    height: 27px;
+  }
+
 }
