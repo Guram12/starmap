@@ -10,8 +10,7 @@ import { BarLoader } from 'react-spinners';
 import Logo from './Logo';
 import { Menu } from 'lucide-react';
 import useIsMobile from '@/hooks/useIsMobile';
-import { motion } from 'framer-motion'
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 
@@ -157,29 +156,31 @@ export default function Header() {
                   onClick={handlerBurgerMenuClick}
                 />
 
-                {!isBurgerMenuOpen && (
-                  <motion.div
-                    className={styles.burgerMenu}
-                    initial={{ opacity: 0, y: -20, x: '-50%' }}
-                    animate={{ opacity: 1, y: 0, x: '-50%' }}
-                    exit={{ opacity: 0, y: -20, x: '-50%' }}
-                    style={{ left: '50%' }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className={styles.navItemsMobile}>
-                      {burgerMenuItems.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
-                          data-path={item.href}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                <AnimatePresence>
+                  {isBurgerMenuOpen && (
+                    <motion.div
+                      className={styles.burgerMenu}
+                      initial={{ opacity: 0, y: -20, x: '-50%' }}
+                      animate={{ opacity: 1, y: 0, x: '-50%' }}
+                      exit={{ opacity: 0, y: -20, x: '-50%' }}
+                      style={{ left: '50%' }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className={styles.navItemsMobile}>
+                        {burgerMenuItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+                            data-path={item.href}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
               </>
 
