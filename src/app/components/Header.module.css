@@ -12,6 +12,12 @@
   height: 60px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   border-radius: 22px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+}
+
+.scrolled {
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
 }
 
 .container {
@@ -24,7 +30,7 @@
   width: 100%;
 }
 
-.logo_name_cont{
+.logo_name_cont {
   display: flex;
   align-items: center;
   gap: 10px;

@@ -13,6 +13,8 @@ import useIsMobile from '@/hooks/useIsMobile';
 
 
 export default function Header() {
+  const [scrolled, setScrolled] = useState(false);
+
   const { user, isAuthenticated, logout, loading } = useAuth();
   const pathname = usePathname();
   const navRef = useRef<HTMLDivElement>(null);
@@ -30,10 +32,32 @@ export default function Header() {
   ];
 
 
+  // ================================================== scroll effect ======================================================
+
+
+  useEffect(() => {
+    if (pathname !== '/map') {
+      setScrolled(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pathname]);
 
 
 
-  // Update indicator position when pathname changes
+
+
+
+  //=================================== Update indicator position when pathname changes ====================================
   useEffect(() => {
     const updateIndicator = () => {
       if (!navRef.current) return;
@@ -71,7 +95,7 @@ export default function Header() {
 
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.container}>
         <div className={styles.logo_name_cont} >
           <Logo />
@@ -85,7 +109,7 @@ export default function Header() {
           {isMobile ?
             (
               <>
-                <Menu 
+                <Menu
                   style={{
                     cursor: 'pointer',
                     color: '#000',
