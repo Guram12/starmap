@@ -11,7 +11,13 @@ import Logo from './Logo';
 import { Menu } from 'lucide-react';
 import useIsMobile from '@/hooks/useIsMobile';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { House } from 'lucide-react';
+import { Settings } from 'lucide-react';
+import { MapPin } from 'lucide-react';
+import { History } from 'lucide-react';
+import { KeyRound } from 'lucide-react';
+import { UserRoundPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 
 export default function Header() {
@@ -25,7 +31,7 @@ export default function Header() {
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const isMobile = useIsMobile(768);
 
-
+const router = useRouter();
 
 
   const handlerBurgerMenuClick = () => {
@@ -69,6 +75,32 @@ export default function Header() {
       ]);
     }
   }, [isAuthenticated]);
+  // ======================================================= render burger icons ============================================
+
+
+  const renderBurgerIcon = (href: string) => {
+    switch (href) {
+      case '/':
+        return <House className={styles.burgermenu_icons} />;
+      case '/preferences':
+        return <Settings className={styles.burgermenu_icons} />;
+      case '/map':
+        return <MapPin className={styles.burgermenu_icons} />;
+      case '/history':
+        return <History className={styles.burgermenu_icons} />;
+      case '/auth/login':
+        return <KeyRound className={styles.burgermenu_icons} />;
+      case '/auth/register':
+        return <UserRoundPlus className={styles.burgermenu_icons} />;
+    }
+  }
+
+
+  const handle_burger_page_click = (href: string) => {
+    setIsBurgerMenuOpen(false);
+    router.push(href);
+
+  }
 
 
   // ================================================== scroll effect ======================================================
@@ -168,14 +200,20 @@ export default function Header() {
                     >
                       <div className={styles.navItemsMobile}>
                         {burgerMenuItems.map((item) => (
-                          <Link
+                          <div
+                            className={styles.nav_button_with_icon}
                             key={item.href}
-                            href={item.href}
-                            className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
-                            data-path={item.href}
+                            onClick={() => handle_burger_page_click(item.href)}
                           >
-                            {item.label}
-                          </Link>
+                            {renderBurgerIcon(item.href)}
+                            <Link
+                              href={item.href}
+                              className={`${styles.navLink_mobile} ${pathname === item.href ? styles.active : ''}`}
+                              data-path={item.href}
+                            >
+                              {item.label}
+                            </Link>
+                          </div>
                         ))}
                       </div>
                     </motion.div>
