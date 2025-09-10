@@ -462,16 +462,8 @@ export default function MapPage() {
                 <p>❌ Error loading map: {mapError}</p>
               </div>
             ) : (
-              <div
-                ref={mapRef}
-                className={styles.mapDiv}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '12px',
-                  backgroundColor: '#FFFFFF'
-                }}
-              />
+                <div ref={mapRef} className={styles.mapDiv} />
+
             )}
           </div>
         </div>

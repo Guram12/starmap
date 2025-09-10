@@ -259,7 +259,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   border-radius: 12px;
+  z-index: 10;
 }
 
 .mapTitle {
@@ -281,11 +283,17 @@
   text-align: center;
 }
 
+
 .mapDiv {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   flex: 1;
   min-height: 280px;
   height: auto;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  z-index: 10;
 }
 
 .placeholderIcon {
@@ -375,6 +383,23 @@
   }
 }
 
+.placeItem {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.settingsCard {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.result_cardTitle {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+}
+
+.placeItem {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+}
 
 /* =================================================    mobile styles   ===================================================== */
 
@@ -427,5 +452,6 @@
     flex-direction: column;
     gap: 20px;
   }
+
 
 }
