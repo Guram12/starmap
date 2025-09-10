@@ -293,19 +293,38 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .preferencesPage {
+    min-height: 100vh;
+    background: #667eea;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .preferencesPage {
     padding: 1rem;
   }
 
   .container {
+    margin-top: 80px;
     padding: 2rem 1.5rem;
   }
 
+  .header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
   .title {
-    font-size: 2rem;
+    font-size: 20px !important;
   }
 
   .actions {
     flex-direction: column;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    font-size: 14px ;
   }
 
   .actionBtn {
