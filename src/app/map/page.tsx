@@ -452,8 +452,8 @@ export default function MapPage() {
               <h3 className={styles.mapTitle}>
                 <MapPinned className={styles.mapIcon} /> Map
               </h3>
-              <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-                {preferences.region ? `Showing results for ${preferences.region}` : 'Set region in preferences'}
+              <span className={styles.mapSubtitle}>
+                {preferences.region ? `Results for ${preferences.region}` : 'Set region in preferences'}
               </span>
             </div>
 

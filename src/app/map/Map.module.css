@@ -264,6 +264,11 @@
   z-index: 10;
 }
 
+.mapSubtitle {
+  color: #6b7280;
+  font-size: 15px;
+}
+
 .mapTitle {
   font-weight: 600;
   color: #1f2937;
@@ -453,5 +458,22 @@
     gap: 20px;
   }
 
+  .mapHeader {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 12px;
+    z-index: 10;
+  }
+
+  .mapSubtitle {
+    color: #6b7280;
+    font-size: 14px;
+    width: 230px;
+    border: 1px solid rebeccapurple;
+  }
 
 }
