@@ -66,6 +66,7 @@ const router = useRouter();
         { href: '/auth/login', label: 'Login' },
         { href: '/auth/register', label: 'Register' },
       ]);
+        setIsBurgerMenuOpen(false);
     } else {
       setBurgerMenuItems([
         { href: '/', label: 'Home' },
@@ -73,6 +74,7 @@ const router = useRouter();
         { href: '/map', label: 'Map' },
         { href: '/history', label: 'History' },
       ]);
+      setIsBurgerMenuOpen(false);
     }
   }, [isAuthenticated]);
   // ======================================================= render burger icons ============================================
