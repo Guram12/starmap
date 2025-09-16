@@ -5,29 +5,40 @@ A Next.js application that helps users discover places based on star ratings and
 ## 🚀 Features
 
 ### Current Features
-- **User Preferences Management**: Set and save search criteria locally
-- **Region Selection**: Choose your preferred search area
-- **Place Type Filtering**: Filter by restaurants, hotels, tourist attractions, shopping centers, and healthcare facilities
-- **Star Rating Control**: Set minimum star ratings (1-5 stars)
-- **Search Radius**: Define search radius (1-50 km)
-- **Responsive Design**: Works on desktop and mobile devices
-- **Local Storage**: Preferences persist without registration
+- ✅ **User Authentication System**: Complete registration and login with JWT tokens
+- ✅ **User Preferences Management**: Set and save search criteria (local + cloud storage)
+- ✅ **Google Maps Integration**: Interactive map with advanced markers and info windows
+- ✅ **Google Places API**: Real-time place search with geocoding support
+- ✅ **Region Selection**: Search any city/region worldwide or use current location
+- ✅ **Place Type Filtering**: Restaurants, hotels, tourist attractions, shopping centers, healthcare
+- ✅ **Star Rating Control**: Minimum star ratings (1-5 stars) with visual slider
+- ✅ **Search Radius**: Customizable radius (1-10 km) with optimization
+- ✅ **Search History**: Database-stored search history for authenticated users
+- ✅ **Place Details**: Rich info windows with photos, ratings, and Google Maps links
+- ✅ **Responsive Design**: Mobile-optimized with burger menu and touch interactions
+- ✅ **Smart Caching**: API call optimization with debouncing and result caching
+- ✅ **Geolocation Support**: One-click current location detection
 
 ### Planned Features
-- 🗺️ **Interactive Map Integration**: Visual map interface for place discovery
-- 👤 **User Authentication**: Optional registration and login system
-- 🔍 **Real-time Place Search**: Integration with places APIs (Google Places, etc.)
 - 📱 **Mobile App**: React Native version
 - ⭐ **Place Reviews**: User-generated reviews and ratings
 - 📊 **Analytics Dashboard**: Usage statistics and preferences insights
+- 🔄 **Favorites System**: Save and organize favorite places
+- 🌍 **Multi-language Support**: Internationalization
 
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
 - **Language**: TypeScript/JavaScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT tokens with HTTP-only cookies
+- **Maps**: Google Maps API with Places API
 - **Styling**: CSS Modules
-- **State Management**: React Hooks (useState, useEffect)
-- **Storage**: localStorage (client-side persistence)
+- **State Management**: React Context API + Hooks (useState, useEffect)
+- **Storage**: localStorage (client-side) + PostgreSQL (server-side)
+- **Icons**: Lucide React Icons
+- **Animations**: Framer Motion & GSAP
+- **Spinners**: React Spinners
 - **Fonts**: Geist Sans & Geist Mono
 
 ## 📁 Project Structure
@@ -37,18 +48,29 @@ src/app/
 ├── layout.tsx                    # Root layout with global header
 ├── page.tsx                      # Home page
 ├── globals.css                   # Global styles
+├── AuthProvider.tsx              # Authentication context provider
 ├── components/
-│   ├── Header.tsx               # Navigation header
-│   └── Header.module.css        # Header styles
+│   ├── Header.tsx               # Navigation header with auth
+│   ├── Header.module.css        # Header styles
+│   └── Logo.tsx                 # Logo component
 ├── preferences/
 │   └── page.tsx                 # User preferences configuration
 ├── map/
-│   └── page.tsx                 # Map interface (planned)
-└── auth/
-    ├── login/
-    │   └── page.tsx            # User login
-    └── register/
-        └── page.tsx            # User registration
+│   └── page.tsx                 # Interactive map with place markers
+├── history/
+│   └── page.tsx                 # Search history for authenticated users
+├── auth/
+│   ├── login/
+│   │   └── page.tsx            # User login
+│   └── register/
+│       └── page.tsx            # User registration
+└── api/
+    ├── auth/
+    │   ├── login/route.ts      # Login API endpoint
+    │   ├── register/route.ts   # Registration API endpoint
+    │   └── me/route.ts         # User profile endpoint
+    └── search-history/
+        └── route.ts            # Search history API
 ```
 
 ## 🚀 Getting Started
@@ -88,14 +110,27 @@ pnpm dev
 ## 📖 How to Use
 
 1. **Set Preferences**: Visit `/preferences` to configure your search criteria
-   - Choose your region/city
-   - Select place types (restaurants, hotels, etc.)
-   - Set minimum star rating
-   - Define search radius
+   - Choose your region/city or use current location
+   - Select place types (restaurants, hotels, tourist attractions, shopping, healthcare)
+   - Set minimum star rating (1-5 stars)
+   - Define search radius (1-10 km)
+   - Click "Save & Search" to find places
 
-2. **View Map**: Go to `/map` to see places matching your criteria (in development)
+2. **View Map**: Go to `/map` to see places matching your criteria
+   - Interactive map with custom markers
+   - Click markers to see place details with photos
+   - Direct links to Google Maps for navigation
+   - Responsive sidebar with place list
 
-3. **Optional Registration**: Create an account at `/auth/register` for cloud sync (planned)
+3. **Search History**: Register/login to save your searches
+   - View past searches at `/history`
+   - Click any search to reload those results
+   - Clear history or view statistics
+
+4. **Authentication**: Optional but recommended
+   - Register at `/auth/register` for automatic login
+   - Login at `/auth/login` to access saved searches
+   - All preferences sync between devices
 
 ## 🗺️ Roadmap
 
@@ -105,20 +140,21 @@ pnpm dev
 - [x] Local storage integration
 - [x] Responsive design
 
-### Phase 2: Map Integration 🚧
-- [ ] Google Maps/Leaflet integration
-- [ ] Place search API integration
-- [ ] Real-time place filtering
-- [ ] Place details modal
+### Phase 2: Map Integration ✅
+- [x] Google Maps integration
+- [x] Place search API integration
+- [x] Real-time place filtering
+- [x] Place details with photos
 
-### Phase 3: User System 📋
-- [ ] User authentication
-- [ ] Cloud preferences sync
-- [ ] User profiles
-- [ ] Favorite places
+### Phase 3: User System ✅
+- [x] User authentication
+- [x] Cloud preferences sync
+- [x] User profiles
+- [x] Search history
 
 ### Phase 4: Advanced Features 📋
 - [ ] Place reviews and ratings
+- [ ] Favorites system
 - [ ] Photo uploads
 - [ ] Social sharing
 - [ ] Mobile app
@@ -140,8 +176,11 @@ This project serves as a hands-on learning experience for:
 - Server vs Client components
 - CSS Modules
 - React hooks and state management
-- API integration (planned)
-- TypeScript (planned migration)
+- Google Maps API integration
+- Authentication with JWT
+- Database integration with Prisma
+- API design and implementation
+- TypeScript implementation
 
 ## 📄 License
 
