@@ -31,12 +31,20 @@ export default function Header() {
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const isMobile = useIsMobile(768);
 
-const router = useRouter();
+  const router = useRouter();
 
 
   const handlerBurgerMenuClick = () => {
     setIsBurgerMenuOpen(!isBurgerMenuOpen);
   }
+
+  // ----------------------------------------
+  useEffect(() => {
+    if (!isMobile) {
+      setIsBurgerMenuOpen(false);
+    }
+  }, [isMobile])
+  // ----------------------------------------
 
 
   // ================================================= Navigation items ====================================================
@@ -66,7 +74,7 @@ const router = useRouter();
         { href: '/auth/login', label: 'Login' },
         { href: '/auth/register', label: 'Register' },
       ]);
-        setIsBurgerMenuOpen(false);
+      setIsBurgerMenuOpen(false);
     } else {
       setBurgerMenuItems([
         { href: '/', label: 'Home' },
