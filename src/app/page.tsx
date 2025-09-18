@@ -28,7 +28,7 @@ export default function Page() {
             <Link href="/auth/register" className={styles.primaryBtn}>
               Get Started Free
             </Link>
-            <Link href="/map" className={styles.secondaryBtn}>
+            <Link href="/preferences" className={styles.secondaryBtn}>
               🗺️ Explore Now
             </Link>
           </div>
@@ -72,8 +72,8 @@ export default function Page() {
 
       <section className={styles.cta}>
         <div className={styles.ctaContent}>
-          <h2>Ready to Explore?</h2>
-          <p>Join for discovering amazing places</p>
+          <h2 className={styles.ctaTitle}>Ready to Explore?</h2>
+          <p className={styles.ctaSubtitle}>Join for discovering amazing places</p>
           <Link href="/preferences" className={styles.ctaBtn}>
             Set Your Preferences
           </Link>
