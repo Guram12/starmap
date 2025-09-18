@@ -6,10 +6,10 @@ import styles from './Preferences.module.css';
 import { usePlacesSearch } from '../../hooks/usePlacesSearch';
 import { useGoogleMap } from '../../hooks/useGoogleMap';
 import { useAuth } from '../AuthProvider';
-import SyncLoader from "react-spinners/SyncLoader";
 import { useSearchParams } from 'next/navigation';
 import { gsap } from 'gsap';
 import { FaLocationCrosshairs } from "react-icons/fa6";
+import { BarLoader } from 'react-spinners';
 
 
 
@@ -454,11 +454,9 @@ export default function Preferences() {
           }
 
 
-
-
           {loading && (
             <div className={styles.loading_cont}>
-              <SyncLoader color="#10b981" size={8} margin={4} />
+              <BarLoader speedMultiplier={2} color='#10b981' />
             </div>
           )}
 
@@ -483,6 +481,8 @@ export default function Preferences() {
                 🗺️ Go to Map. ( places found {places.length} )
               </Link>
             )}
+
+            
           </div>
         </form>
       </div>
