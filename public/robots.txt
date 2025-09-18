@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /preferences
+Allow: /map
+Allow: /auth/login
+Allow: /auth/register
+
+Disallow: /api/
+Disallow: /history
+
+Sitemap: https://starmp.space/sitemap.xml

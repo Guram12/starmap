@@ -146,7 +146,7 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 0px;
   justify-content: center;
 }
 
@@ -286,7 +286,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px 0;
+  padding:  0px;
+  margin-top: 10px;
 }
 
 

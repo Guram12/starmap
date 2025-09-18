@@ -127,6 +127,7 @@ export function usePlacesSearch() {
         console.log(`Searching with radius: ${optimizedRadius}km for location: ${locationName || 'Unknown'}`);
         console.log(`Limited to ${MAX_RESULTS.current} results to reduce API costs`);
 
+
         const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
           service.nearbySearch(request, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
@@ -173,7 +174,6 @@ export function usePlacesSearch() {
         console.error('Search error:', err);
         setError('Search failed: ' + (err as Error).message);
       } finally {
-        setLoading(false);
         lastSearchRef.current = '';
       }
     }, DEBOUNCE_DELAY.current);
@@ -235,10 +235,8 @@ export function usePlacesSearch() {
         }
       });
     });
-  }, []); // Remove dependencies since we're using refs
+  }, []);
 
-  return { places, loading, error, setError, searchPlaces, geocodeLocation };
+  return { places, loading, setLoading, error, setError, searchPlaces, geocodeLocation };
 }
 
-// This hook is now used only from the preferences page for searching
-// The map page loads results from localStorage instead of making API calls

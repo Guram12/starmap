@@ -32,6 +32,8 @@
   font-size: 16px;
   font-weight: 600;
   color: #000;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
 }
 
 .setregion_button {
@@ -45,6 +47,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
 }
 
 .setregion_button:hover {
@@ -433,6 +437,11 @@
     height: 100%;
   }
 
+  .no_region_errorMessage {
+    max-width: 90%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+  }
 
   .mapContainer {
     flex: 1;
@@ -473,7 +482,49 @@
     color: #6b7280;
     font-size: 14px;
     width: 230px;
-    border: 1px solid rebeccapurple;
+  }
+  
+  .mapDiv {
+    flex: 1;
+    min-height: 280px;
+    height: auto;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px !important;
+    height: 100% !important;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    z-index: 10;
+    margin-bottom: 30px !important;
+  }
+
+  .mapDiv :global(.gm-style-iw) {
+    min-height: auto !important;
+    max-height: 500px !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  
+  .mapDiv :global(.gm-style-iw-c) {
+    padding: 12px !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .mapDiv :global(.gm-style-iw-d) {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Ensure InfoWindow content is fully visible */
+  .mapDiv :global(.gm-style-iw-tc) {
+    height: auto !important;
+  }
+
+  /* Ensure buttons and content are visible in InfoWindow */
+  .mapDiv :global(.gm-style-iw) :global(*) {
+    box-sizing: border-box !important;
   }
 
 }
