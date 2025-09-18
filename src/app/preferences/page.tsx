@@ -208,6 +208,7 @@ export default function Preferences() {
 
   // =================================================  store in localStorage =================================================
 
+
   useEffect(() => {
     if (places && places.length > 0) {
       const searchResults = {
@@ -239,9 +240,12 @@ export default function Preferences() {
         saveSearchWithPlacesToDatabase();
       } else {
         console.log('👤 PREFERENCES: Non-authenticated user - only saving to localStorage');
+        // Ensure loading is set to false for non-authenticated users
+        setLoading(false);
       }
     }
-  }, [places]);
+  }, [places, saveSearchWithPlacesToDatabase, isAuthenticated]); // Add missing dependencies
+
 
   // ===================================================  focus region input ===================================================
 
@@ -482,7 +486,7 @@ export default function Preferences() {
               </Link>
             )}
 
-            
+
           </div>
         </form>
       </div>

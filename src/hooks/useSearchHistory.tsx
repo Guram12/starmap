@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-
+import { useAuth } from '@/app/AuthProvider';
+  
 interface SearchPlace {
   id: number;
   placeId: string;
@@ -53,6 +54,7 @@ export function useSearchHistory() {
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   // Fetch search history
   const fetchSearchHistory = useCallback(async () => {
@@ -134,8 +136,10 @@ export function useSearchHistory() {
 
   // Load search history on mount
   useEffect(() => {
-    fetchSearchHistory();
-  }, [fetchSearchHistory]);
+    if (isAuthenticated) {
+      fetchSearchHistory();
+    } 
+  }, [fetchSearchHistory, isAuthenticated]);
 
   return {
     searchHistory,

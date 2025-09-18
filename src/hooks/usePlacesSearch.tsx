@@ -235,10 +235,8 @@ export function usePlacesSearch() {
         }
       });
     });
-  }, []); // Remove dependencies since we're using refs
+  }, []);
 
   return { places, loading, setLoading, error, setError, searchPlaces, geocodeLocation };
 }
 
-// This hook is now used only from the preferences page for searching
-// The map page loads results from localStorage instead of making API calls
