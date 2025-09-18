@@ -1,6 +1,6 @@
-
 import { Metadata } from 'next';
 import HistoryClient from './HistoryClient';
+import StructuredData from '../StructuredData';
 
 
 
@@ -29,9 +29,35 @@ export const metadata: Metadata = {
   },
 };
 
-
-
+const historyStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Search History - StarMap",
+  "description": "View and revisit your previous searches. Access your search history to explore places you've searched for.",
+  "url": "https://starmp.space/history",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "StarMap",
+    "url": "https://starmp.space"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Search History",
+    "description": "Previous place searches with results and preferences",
+    "numberOfItems": "varies"
+  },
+  "potentialAction": {
+    "@type": "ViewAction",
+    "target": "https://starmp.space/history",
+    "name": "View Search History"
+  }
+};
 
 export default function HistoryPage() {
-  return <HistoryClient />;
+  return (
+    <>
+      <StructuredData data={historyStructuredData} />
+      <HistoryClient />
+    </>
+  );
 }

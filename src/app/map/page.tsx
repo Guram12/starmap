@@ -1,5 +1,6 @@
 import MapClient from './MapClient';
 import { Metadata } from 'next';
+import StructuredData from '../StructuredData';
 
 
 
@@ -28,9 +29,45 @@ export const metadata: Metadata = {
   },
 };
 
-
+const mapStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Interactive Map - StarMap",
+  "description": "View discovered places on an interactive map. Click markers to see details, ratings, and get directions.",
+  "url": "https://starmp.space/map",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "StarMap",
+    "url": "https://starmp.space"
+  },
+  "mainEntity": {
+    "@type": "Map",
+    "name": "StarMap Interactive Places Map",
+    "description": "Interactive map showing restaurants, hotels, and attractions with ratings and details",
+    "mapType": "https://schema.org/VenueMap"
+  },
+  "potentialAction": [
+    {
+      "@type": "ViewAction",
+      "target": "https://starmp.space/map",
+      "name": "View Places on Map"
+    },
+    {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://starmp.space/preferences"
+      },
+      "name": "Search for Places"
+    }
+  ]
+};
 
 export default function MapPage() {
-  return <MapClient />;
+  return (
+    <>
+      <StructuredData data={mapStructuredData} />
+      <MapClient />
+    </>
+  );
 }
- 

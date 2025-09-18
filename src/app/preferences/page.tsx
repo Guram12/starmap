@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import PreferencesClient from './PreferencesClient';
+import StructuredData from "../StructuredData";
+
 
 
 
@@ -28,8 +30,38 @@ export const metadata: Metadata = {
   },
 };
 
-
+const preferencesStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Set Your Preferences - StarMap",
+  "description": "Customize your search criteria to find the perfect places. Set location, place type, minimum star ratings, and search radius.",
+  "url": "https://starmp.space/preferences",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "StarMap",
+    "url": "https://starmp.space"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://starmp.space/map?region={search_term}"
+    },
+    "query-input": "required name=search_term"
+  },
+  "mainEntity": {
+    "@type": "SoftwareApplication",
+    "name": "StarMap Preferences",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web Browser"
+  }
+};
 
 export default function Preferences() {
-  return <PreferencesClient />;
+  return (
+    <>
+      <StructuredData data={preferencesStructuredData} />
+      <PreferencesClient />
+    </>
+  );
 }

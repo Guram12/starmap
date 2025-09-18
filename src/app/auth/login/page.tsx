@@ -1,8 +1,8 @@
-'use client'
-
-
 import { Metadata } from 'next'
 import LoginClient from './LoginClient'
+import StructuredData from '@/app/StructuredData';
+
+
 
 export const metadata: Metadata = {
   title: "Login to StarMap",
@@ -29,11 +29,29 @@ export const metadata: Metadata = {
   },
 };
 
-
-
-
+const loginStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Login to StarMap",
+  "description": "Sign in to your StarMap account to save preferences and access your search history.",
+  "url": "https://starmp.space/auth/login",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "StarMap",
+    "url": "https://starmp.space"
+  },
+  "potentialAction": {
+    "@type": "LoginAction",
+    "target": "https://starmp.space/auth/login",
+    "name": "Login to StarMap Account"
+  }
+};
 
 export default function Login() {
-  return <LoginClient />;
+  return (
+    <>
+      <StructuredData data={loginStructuredData} />
+      <LoginClient />
+    </>
+  );
 }
-

@@ -1,5 +1,10 @@
 import { Metadata } from 'next'
 import RegisterClient from './RegisterClient'
+import StructuredData from '@/app/StructuredData';
+
+
+
+
 
 export const metadata: Metadata = {
   title: "Register for StarMap",
@@ -26,7 +31,29 @@ export const metadata: Metadata = {
   },
 };
 
+const registerStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Register for StarMap",
+  "description": "Create your StarMap account to save preferences, access search history, and get personalized recommendations.",
+  "url": "https://starmp.space/auth/register",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "StarMap",
+    "url": "https://starmp.space"
+  },
+  "potentialAction": {
+    "@type": "RegisterAction",
+    "target": "https://starmp.space/auth/register",
+    "name": "Create StarMap Account"
+  }
+};
 
 export default function Register() {
-  return <RegisterClient />;
+  return (
+    <>
+      <StructuredData data={registerStructuredData} />
+      <RegisterClient />
+    </>
+  );
 }
