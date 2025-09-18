@@ -24,6 +24,11 @@ export default function Preferences() {
   const [searchRadius, setSearchRadius] = useState<number>(5);
   const [locationLoading, setLocationLoading] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+
+
+  const [show_search_button, setShow_search_button] = useState<boolean>(true);
+
+
   const { mapRef, map, isLoaded } = useGoogleMap();
   const { places, loading, setLoading, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
   const { isAuthenticated } = useAuth();
@@ -304,7 +309,13 @@ export default function Preferences() {
 
   }, [region, placeType, minStars, searchRadius])
 
+  // =========================================  showing and removing search button =============================================
 
+  useEffect(() => {
+    if (region && placeType && minStars && searchRadius) {
+      setShow_search_button(true);
+    }
+  }, [region, placeType, minStars, searchRadius]);
 
   // ==========================================================================================================================
 
@@ -330,7 +341,7 @@ export default function Preferences() {
           </p>
         </div>
 
-        <form className={styles.form} onSubmit={(e) => { e.preventDefault(); savePreferences(); }}>
+        <form className={styles.form} onSubmit={(e) => { e.preventDefault(); savePreferences(); setShow_search_button(false); }}>
           <div className={styles.field}>
             <label htmlFor="region" className={styles.label}>
               📍 Region
@@ -456,13 +467,17 @@ export default function Preferences() {
 
 
           <div className={styles.actions}>
-            <button
-              type="submit"
-              className={`${styles.actionBtn} ${styles.saveBtn}`}
-              disabled={loading || !isLoaded}
-            >
-              {'💾 Save & Search'}
-            </button>
+
+            {show_search_button && (
+              <button
+                type="submit"
+                className={`${styles.actionBtn} ${styles.saveBtn}`}
+                disabled={loading || !isLoaded}
+              >
+                {'💾 Save & Search'}
+              </button>
+            )}
+
             {!loading && places.length > 0 && (
               <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
                 🗺️ Go to Map. ( places found {places.length} )
