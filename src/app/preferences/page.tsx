@@ -22,11 +22,10 @@ export default function Preferences() {
   const [placeType, setPlaceType] = useState<PlaceType>('restaurant');
   const [minStars, setMinStars] = useState<number>(3);
   const [searchRadius, setSearchRadius] = useState<number>(5);
-  const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const [locationLoading, setLocationLoading] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const { mapRef, map, isLoaded } = useGoogleMap();
-  const { places, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
+  const { places, loading, setLoading, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
   const { isAuthenticated } = useAuth();
 
 
@@ -98,6 +97,7 @@ export default function Preferences() {
       return;
     }
 
+    setLoading(true);
     setSearchLoading(true);
 
     try {
@@ -132,8 +132,6 @@ export default function Preferences() {
         throw new Error('Map not ready for search');
       }
 
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
 
     } catch (error) {
       console.error('Error saving preferences or searching:', error);
@@ -194,6 +192,7 @@ export default function Preferences() {
       if (response.ok) {
         const result = await response.json();
         console.log('✅ PREFERENCES: Search results saved to database with places:', result.searchHistory?.places?.length || 0);
+        setLoading(false);
       } else {
         console.error('❌ PREFERENCES: Failed to save to database');
       }
@@ -264,19 +263,8 @@ export default function Preferences() {
     return icons[type] || '📍';
   };
 
-  const [showError, setShowError] = useState<boolean>(false);
 
 
-  useEffect(() => {
-    if (searchError) {
-      setShowError(true);
-      const timer = setTimeout(() => {
-        setError(null);
-        setTimeout(() => setShowError(false), 500);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [searchError]);
 
   // =============================== change background color when  search finishes =====================================
 
@@ -448,23 +436,21 @@ export default function Preferences() {
           </div>
 
 
-          <div className={`${styles.errorMessage_container_for_empty_search} ${showError ? styles.show : styles.hide}`}>
-            {searchError === null ? null :
-              <p className={styles.errorMessage}>
-                ❌ Search Error: {searchError}
-              </p>
-            }
-          </div>
+          {searchError === null ? null :
+            <p className={styles.errorMessage}>
+              ❌ Search Error: {searchError}
+            </p>
+          }
 
 
 
-          <div className={`${styles.errorMessage_container} ${showError ? styles.show : styles.hide}`}>
-            {showSuccess && places.length > 0 && (
-              <div className={styles.loading_cont}>
-                <SyncLoader color="#10b981" size={8} margin={4} />
-              </div>
-            )}
-          </div>
+
+          {loading && (
+            <div className={styles.loading_cont}>
+              <SyncLoader color="#10b981" size={8} margin={4} />
+            </div>
+          )}
+
 
 
 
@@ -473,11 +459,11 @@ export default function Preferences() {
             <button
               type="submit"
               className={`${styles.actionBtn} ${styles.saveBtn}`}
-              disabled={searchLoading || !isLoaded}
+              disabled={loading || !isLoaded}
             >
-              {searchLoading && places.length > 0 ? '🔍 Searching...' : '💾 Save & Search'}
+              {'💾 Save & Search'}
             </button>
-            {!searchLoading && places.length > 0 && !showSuccess && (
+            {!loading && places.length > 0 && (
               <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
                 🗺️ Go to Map. ( places found {places.length} )
               </Link>
