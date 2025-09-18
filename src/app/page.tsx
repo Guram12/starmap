@@ -1,9 +1,33 @@
 import Link from "next/link";
 import styles from "./page.module.css";
+import { Metadata } from "next";
 
 
 
-
+export const metadata: Metadata = {
+  title: "StarMap - Discover Amazing Places",
+  description: "Explore restaurants, hotels, and attractions with personalized recommendations based on your preferences and ratings.",
+  keywords: ["places finder", "restaurant finder", "hotel search", "tourist attractions", "star ratings"],
+  openGraph: {
+    title: "StarMap - Discover Amazing Places",
+    description: "Explore restaurants, hotels, and attractions with personalized recommendations.",
+    url: "https://starmp.space",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "StarMap - Discover Amazing Places",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StarMap - Discover Amazing Places",
+    description: "Explore restaurants, hotels, and attractions with personalized recommendations.",
+    images: ["/og-image.jpg"],
+  },
+};
 
 
 
