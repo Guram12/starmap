@@ -19,12 +19,6 @@ A Next.js application that helps users discover places based on star ratings and
 - ✅ **Smart Caching**: API call optimization with debouncing and result caching
 - ✅ **Geolocation Support**: One-click current location detection
 
-### Planned Features
-- 📱 **Mobile App**: React Native version
-- ⭐ **Place Reviews**: User-generated reviews and ratings
-- 📊 **Analytics Dashboard**: Usage statistics and preferences insights
-- 🔄 **Favorites System**: Save and organize favorite places
-- 🌍 **Multi-language Support**: Internationalization
 
 ## 🛠️ Tech Stack
 
@@ -152,39 +146,6 @@ pnpm dev
 - [x] User profiles
 - [x] Search history
 
-### Phase 4: Advanced Features 📋
-- [ ] Place reviews and ratings
-- [ ] Favorites system
-- [ ] Photo uploads
-- [ ] Social sharing
-- [ ] Mobile app
-
-## 🤝 Contributing
-
-This is a learning project for Next.js development. Contributions, suggestions, and feedback are welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📝 Learning Goals
-
-This project serves as a hands-on learning experience for:
-- Next.js App Router
-- File-based routing
-- Server vs Client components
-- CSS Modules
-- React hooks and state management
-- Google Maps API integration
-- Authentication with JWT
-- Database integration with Prisma
-- API design and implementation
-- TypeScript implementation
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
