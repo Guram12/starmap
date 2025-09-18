@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import { AuthProvider } from "./AuthProvider";
 import CookieBanner from "@/lib/CookieBanner";
+import Script from 'next/script';
 
 
 
@@ -21,6 +22,7 @@ const geistMono = Geist_Mono({
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   title: {
     default: "StarMap - Find Your Perfect Places with Star Ratings",
     template: "%s | StarMap"
@@ -54,7 +56,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://starmp.space',
+    url: '/',
     title: 'StarMap - Find Your Perfect Places',
     description: 'Discover amazing places based on star ratings and preferences',
     siteName: 'StarMap',
@@ -79,6 +81,7 @@ export const metadata: Metadata = {
 };
 
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -95,6 +98,21 @@ export default function RootLayout({
           {children}
           <CookieBanner />
         </AuthProvider>
+
+        {/* Google Analytics */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_MEASUREMENT_ID}');
+          `}
+        </Script>
+
       </body>
     </html>
   );
