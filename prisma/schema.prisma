@@ -15,7 +15,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
-  // Add relation to search history
+  // relation to search history
   searchHistory SearchHistory[]
 
   @@map("users")
@@ -32,7 +32,6 @@ model SearchHistory {
   resultsCount Int      @default(0)
   searchedAt   DateTime @default(now())
 
-  // Add places relation
   places SearchPlace[]
 
   // Relation to User
@@ -57,7 +56,7 @@ model SearchPlace {
   priceLevel       Int?
   websiteURI       String?
   phoneNumber      String?
-  photoUrl         String? // Add this field to store the first photo URL
+  photoUrl         String? 
 
   // Relation to SearchHistory
   searchHistory SearchHistory @relation(fields: [searchHistoryId], references: [id], onDelete: Cascade)
