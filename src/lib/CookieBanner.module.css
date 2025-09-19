@@ -65,3 +65,28 @@
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
+
+@media screen and (max-width: 768px) {
+  .banner {
+    bottom: 20px;
+    width: 90%;
+    padding: 0.75rem;
+    box-shadow: 0 6px 16px rgba(0 0 0 / 0.68);
+
+  }
+
+  .text {
+    font-size: 14px;
+  }
+
+  .emoji {
+    font-size: 24px;
+  }
+
+  .button {
+    width: 100%;
+    min-width: unset;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
