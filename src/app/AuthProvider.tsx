@@ -29,20 +29,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('/api/auth/me')
+      // First check if there's a stored auth indicator
+      const hasAuthCookie = document.cookie.includes('auth-token') || localStorage.getItem('isLoggedIn')
+      
+      if (!hasAuthCookie) {
+        // Skip API call if no auth indicators are present
+        setUser(null)
+        setLoading(false)
+        return
+      }
+
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include',
+      })
+
       if (response.ok) {
         const userData = await response.json()
         setUser(userData.user)
+        localStorage.setItem('isLoggedIn', 'true')
+      } else {
+        setUser(null)
+        localStorage.removeItem('isLoggedIn')
       }
-    } catch (_error) {
-      console.log('Not authenticated')
+    } catch (error) {
+      setUser(null)
+      localStorage.removeItem('isLoggedIn')
     } finally {
       setLoading(false)
     }
   }
 
   const [hasMounted, setHasMounted] = useState(false)
-
 
   useEffect(() => {
     setHasMounted(true)
@@ -58,17 +75,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       })
 
       const data = await response.json()
       if (data.success) {
         setUser(data.user)
+        localStorage.setItem('isLoggedIn', 'true')
         return { success: true }
       } else {
         return { success: false, error: data.error }
       }
-    } catch (_error) {
+    } catch (error) {
+      console.error('Login error:', error)
       return { success: false, error: 'Network error' }
     } finally {
       setLoading(false)
@@ -77,10 +97,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
       setUser(null)
-    } catch (_error) {
-      console.error('Logout failed')
+      localStorage.removeItem('isLoggedIn')
+    } catch (error) {
+      console.error('Logout failed:', error)
+      setUser(null)
+      localStorage.removeItem('isLoggedIn')
     }
   }
 
