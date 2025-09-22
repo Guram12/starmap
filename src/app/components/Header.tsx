@@ -22,6 +22,9 @@ import { GoDotFill } from "react-icons/go";
 
 
 export default function Header() {
+
+
+  const [websiteLoaded, setWebsiteLoaded] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
   const { user, isAuthenticated, logout, loading } = useAuth();
   const pathname = usePathname();
@@ -47,7 +50,9 @@ export default function Header() {
   }, [isMobile])
   // ----------------------------------------
 
-
+  useEffect(() => {
+    setWebsiteLoaded(true);
+  }, []);
   // ================================================= Navigation items ====================================================
   const navItems = [
     { href: '/', label: 'Home' },
@@ -169,10 +174,14 @@ export default function Header() {
 
 
 
-
   // ================================================== JSX ======================================================
   return (
-    <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
+    <motion.header
+      className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}
+      initial={{ y: '-150%' , x: '-50%' }} 
+      animate={websiteLoaded ? { y: ['-100%', '50%', '0%'] } : {}}
+      transition={{ duration: 1.5, ease: 'circIn' }} 
+    >
       <div className={styles.container}>
         <div className={styles.logo_name_cont}>
           <Logo />
@@ -317,6 +326,6 @@ export default function Header() {
           )}
         </nav>
       </div>
-    </header>
+    </motion.header>
   );
 }
