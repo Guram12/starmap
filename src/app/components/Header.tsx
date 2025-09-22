@@ -18,6 +18,7 @@ import { History } from 'lucide-react';
 import { KeyRound } from 'lucide-react';
 import { UserRoundPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { GoDotFill } from "react-icons/go";
 
 
 export default function Header() {
@@ -84,6 +85,7 @@ export default function Header() {
       ]);
       setIsBurgerMenuOpen(false);
     }
+
   }, [isAuthenticated]);
   // ======================================================= render burger icons ============================================
 
@@ -168,14 +170,11 @@ export default function Header() {
 
 
 
-
-
-
   // ================================================== JSX ======================================================
   return (
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.container}>
-        <div className={styles.logo_name_cont} >
+        <div className={styles.logo_name_cont}>
           <Logo />
           <Link href="/" className={styles.logo}>
             StarMap
@@ -223,6 +222,22 @@ export default function Header() {
                             >
                               {item.label}
                             </Link>
+
+                            {/* active page indicator dot icon */}
+                            {pathname === item.href && (
+                              <GoDotFill
+                                style={{
+                                  position: 'absolute',
+                                  right: '10px',
+                                  top: '7px',
+                                  color: 'black',
+                                  width: '25px',
+                                  height: '25px',
+                                  zIndex: 10,
+                                }}
+                              />
+                            )}
+
                           </div>
                         ))}
                       </div>
