@@ -42,7 +42,7 @@ export function usePlacesSearch() {
   // Suppress Google Maps deprecation warnings for cost optimization
   useEffect(() => {
     const originalWarn = console.warn;
-    console.warn = function(message, ...args) {
+    console.warn = function (message, ...args) {
       // Suppress specific Google Maps deprecation warnings
       if (typeof message === 'string' && (
         message.includes('google.maps.places.PlacesService is not available') ||
@@ -171,10 +171,13 @@ export function usePlacesSearch() {
           setError('No places found');
         }
       } catch (err) {
-        console.error('Search error:', err);
+        console.log('Search error:', err);
         setError('Search failed: ' + (err as Error).message);
+        setPlaces([]);
+
       } finally {
         lastSearchRef.current = '';
+        setLoading(false);
       }
     }, DEBOUNCE_DELAY.current);
 
@@ -232,6 +235,8 @@ export function usePlacesSearch() {
         } else {
           console.log('❌ GEOCODING FAILED:', status);
           resolve(null);
+          setLoading(false);
+          setError(status);
         }
       });
     });
