@@ -65,6 +65,8 @@ export default function HistoryClient() {
       priceLevel: place.priceLevel,
       websiteURI: place.websiteURI,
       nationalPhoneNumber: place.phoneNumber,
+      photoUrl: place.photoUrl
+
     }));
 
     // Save search results from history

@@ -16,19 +16,20 @@ interface PlaceData {
   priceLevel: number | null | undefined;
   websiteURI: string | null | undefined;
   nationalPhoneNumber: string | null | undefined;
+  photoUrl: string | null;
 }
 
 // GET - Fetch user's search history with places
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
-    
+
     const searchHistory = await prisma.searchHistory.findMany({
       where: { userId: decoded.userId },
       include: {
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
-    
+
     if (!token) {
       // Return early for unauthenticated users - don't process the request
       return NextResponse.json({ message: 'Not authenticated - skipping database save' }, { status: 200 });
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
     const body = await request.json();
-    
+
     const { region, placeType, minStars, searchRadius, resultsCount, places } = body;
 
     console.log('📝 SAVING SEARCH HISTORY:', {
@@ -104,13 +105,15 @@ export async function POST(request: NextRequest) {
             priceLevel: place.priceLevel ?? null,
             websiteURI: place.websiteURI ?? null,
             phoneNumber: place.nationalPhoneNumber ?? null,
+            photoUrl: place.photoUrl ?? null
+
           }))
         });
       }
 
       const updatedSearch = await prisma.searchHistory.update({
         where: { id: recentSearch.id },
-        data: { 
+        data: {
           resultsCount,
           searchedAt: new Date()
         },
@@ -143,6 +146,8 @@ export async function POST(request: NextRequest) {
             priceLevel: place.priceLevel ?? null,
             websiteURI: place.websiteURI ?? null,
             phoneNumber: place.nationalPhoneNumber ?? null,
+            photoUrl: place.photoUrl // This should be the extracted URL, not the photos array
+
           })) : []
         }
       },
@@ -161,13 +166,13 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
-    
+
     await prisma.searchHistory.deleteMany({
       where: { userId: decoded.userId }
     });

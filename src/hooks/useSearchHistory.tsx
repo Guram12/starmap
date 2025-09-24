@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/AuthProvider';
-  
+
 interface SearchPlace {
   id: number;
   placeId: string;
@@ -13,6 +13,8 @@ interface SearchPlace {
   priceLevel: number | null;
   websiteURI: string | null;
   phoneNumber: string | null;
+  photoUrl: string | null;
+
 }
 
 interface SearchHistoryItem {
@@ -138,7 +140,7 @@ export function useSearchHistory() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchSearchHistory();
-    } 
+    }
   }, [fetchSearchHistory, isAuthenticated]);
 
   return {
