@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding-top: 80px;
+  overflow: hidden;
 }
 
 .container {

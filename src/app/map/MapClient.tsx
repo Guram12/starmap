@@ -90,7 +90,7 @@ export default function MapClient() {
         rating?: number | null;
         formattedAddress?: string | null;
         location: { lat: number; lng: number };
-        photoUrl?: string | null; // Add this
+        photoUrl?: string | null;
         types?: string[];
         priceLevel?: number | null;
         websiteURI?: string | null;
