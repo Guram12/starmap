@@ -10,6 +10,8 @@ import { useSearchParams } from 'next/navigation';
 import { gsap } from 'gsap';
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { BarLoader } from 'react-spinners';
+import { error } from 'console';
+import { div } from 'framer-motion/client';
 
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
@@ -281,7 +283,7 @@ export default function PreferencesClient() {
       const timer = setTimeout(() => {
         if (backgroundRef.current) {
           gsap.to(backgroundRef.current, {
-            duration: 3,
+            duration: 2,
             background: '#10b981',
             ease: "power2.inOut"
           });
@@ -291,9 +293,24 @@ export default function PreferencesClient() {
       return () => clearTimeout(timer);
     }
 
-  }, [searchLoading, places.length]);
+    if (searchError !== null) {
+      if (backgroundRef.current) {
+        gsap.to(backgroundRef.current, {
+          duration: 2,
+          background: '#F50B0B',
+          ease: "power2.inOut"
+        });
+      }
+    }
+
+  }, [searchLoading, places.length, searchError]);
 
 
+  useEffect(() => {
+    console.log('--error--', searchError);
+  }, [searchError]);
+
+  // ----------------------------------------------------------------------
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -306,8 +323,8 @@ export default function PreferencesClient() {
       }
     }, 200);
 
+    setError(null);
     return () => clearTimeout(timer);
-
   }, [region, placeType, minStars, searchRadius])
 
   // =========================================  showing and removing search button =============================================
@@ -450,9 +467,12 @@ export default function PreferencesClient() {
 
 
           {searchError === null ? null :
-            <p className={styles.errorMessage}>
-              ❌ Search Error: {searchError}
-            </p>
+            <div style={{ width: '100%' }} >
+
+              <p className={styles.errorMessage}>
+                ❌ Search Error: {searchError}
+              </p>
+            </div>
           }
 
 
