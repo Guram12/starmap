@@ -33,6 +33,14 @@ export default function PreferencesClient() {
   const { isAuthenticated } = useAuth();
 
 
+  useEffect(() => {
+    console.log('--- isAuthenticated changed ---', isAuthenticated);
+    if (!isAuthenticated) {
+      console.log('👤 User logged out - clearing places and loading state');
+      setLoading(false);
+    }
+   }, [isAuthenticated]);
+
 
 
   // ================================================ load saved preferences ================================================
