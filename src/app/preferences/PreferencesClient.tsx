@@ -366,17 +366,33 @@ export default function PreferencesClient() {
           <div ref={mapRef} style={{ width: '100px', height: '100px' }} />
         </div>
 
-        <div className={styles.header}>
+        <motion.div 
+          className={styles.header}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+        >
           <h1 className={styles.title}>
             ⚙️ Set Your Preferences
           </h1>
           <p className={styles.subtitle}>
             Customize your search criteria to find the perfect places
           </p>
-        </div>
+        </motion.div>
 
-        <form className={styles.form} onSubmit={(e) => { e.preventDefault(); savePreferences(); setShow_search_button(false); }}>
-          <div className={styles.field}>
+        <motion.form 
+          className={styles.form} 
+          onSubmit={(e) => { e.preventDefault(); savePreferences(); setShow_search_button(false); }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          <motion.div 
+            className={styles.field}
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+          >
             <label htmlFor="region" className={styles.label}>
               📍 Region
             </label>
@@ -412,9 +428,14 @@ export default function PreferencesClient() {
             <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
               💡 You can type a location or use your current position
             </div>
-          </div>
+          </motion.div>
 
-          <div className={styles.field}>
+          <motion.div 
+            className={styles.field}
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.25 }}
+          >
             <label htmlFor="placeType" className={styles.label}>
               {getPlaceTypeIcon(placeType)} Place Type
             </label>
@@ -430,9 +451,14 @@ export default function PreferencesClient() {
               <option value="shopping_mall">🛍️ Shopping Centers</option>
               <option value="hospital">🏥 Healthcare</option>
             </select>
-          </div>
+          </motion.div>
 
-          <div className={styles.field}>
+          <motion.div 
+            className={styles.field}
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.25 }}
+          >
             <div className={styles.rangeContainer}>
               <div className={styles.rangeLabel}>
                 <label htmlFor="minStars" className={styles.label}>
@@ -456,9 +482,14 @@ export default function PreferencesClient() {
                 className={styles.rangeInput}
               />
             </div>
-          </div>
+          </motion.div>
 
-          <div className={styles.field}>
+          <motion.div 
+            className={styles.field}
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.25 }}
+          >
             <div className={styles.rangeContainer}>
               <div className={styles.rangeLabel}>
                 <label htmlFor="searchRadius" className={styles.label}>
@@ -478,50 +509,69 @@ export default function PreferencesClient() {
                 className={styles.rangeInput}
               />
             </div>
-          </div>
+          </motion.div>
 
 
           {searchError === null ? null :
-            <div style={{ width: '100%' }} >
+            <motion.div 
+              style={{ width: '100%' }}
+              initial={{ opacity: 0, scale: 0.8, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            >
 
               <p className={styles.errorMessage}>
                 ❌ Search Error: {searchError}
               </p>
-            </div>
+            </motion.div>
           }
 
 
           {loading && (
-            <div className={styles.loading_cont}>
+            <motion.div 
+              className={styles.loading_cont}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            >
               <BarLoader speedMultiplier={2} color='#10b981' />
-            </div>
+            </motion.div>
           )}
 
-
-
-
-
-          <div className={styles.actions}>
-
+          <motion.div 
+            className={styles.actions}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.3 }}
+          >
             {show_search_button && (
-              <button
+              <motion.button
                 type="submit"
                 className={`${styles.actionBtn} ${styles.saveBtn}`}
                 disabled={loading || !isLoaded}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8, duration: 0.25 }}
               >
                 {'💾 Save & Search'}
-              </button>
+              </motion.button>
             )}
 
             {!loading && places.length > 0 && (
-              <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
-                🗺️ Go to Map. ( places found {places.length} )
-              </Link>
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9, duration: 0.25 }}
+              >
+                <Link href="/map" className={`${styles.actionBtn} ${styles.mapBtn}`}>
+                  🗺️ Go to Map. ( places found {places.length} )
+                </Link>
+              </motion.div>
             )}
-
-
-          </div>
-        </form>
+          </motion.div>
+        </motion.form>
       </motion.div>
     </div>
   );
