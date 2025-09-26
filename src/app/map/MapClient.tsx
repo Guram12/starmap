@@ -6,7 +6,7 @@ import styles from './Map.module.css';
 import { MapPinned } from 'lucide-react';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useAuth } from '../AuthProvider';
-
+import { motion } from 'framer-motion';
 
 
 
@@ -350,15 +350,43 @@ export default function MapClient() {
   if (preferences.region === '') {
     return (
       <div className={styles.no_region_container}>
-        <div className={styles.no_region_errorMessage}>
+        <motion.div
+          className={styles.no_region_errorMessage}
+          initial={{ opacity: 0, y: 100, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20,
+            mass: 1,
+            duration: 0.6,
+            delay: 0.3,
+          }}
+        >
           <p>⚠️ No region set. Please go to Preferences to set your search criteria.</p>
-        </div>
+        </motion.div>
 
-        <button className={styles.setregion_button}>
-          <a href="/preferences?f=region" className={styles.actionBtn}>
-            ⚙️ Go to Preferences
-          </a>
-        </button>
+        <motion.div
+          initial={{ opacity: 0, y: 100, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20,
+            mass: 1,
+            duration: 0.6,
+            // delay: 0.1,
+          }}
+        >
+          <button
+            className={styles.setregion_button}
+
+          >
+            <a href="/preferences?f=region" className={styles.actionBtn}>
+              ⚙️ Go to Preferences
+            </a>
+          </button>
+        </motion.div>
 
       </div>
     );
@@ -464,7 +492,7 @@ export default function MapClient() {
                 <p>❌ Error loading map: {mapError}</p>
               </div>
             ) : (
-                <div ref={mapRef} className={styles.mapDiv} />
+              <div ref={mapRef} className={styles.mapDiv} />
 
             )}
           </div>

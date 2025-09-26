@@ -180,7 +180,13 @@ export default function Header() {
       className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}
       initial={{ y: '-150%' , x: '-50%' }} 
       animate={websiteLoaded ? { y: ['-100%', '50%', '0%'] } : {}}
-      transition={{ duration: 1.5, ease: 'circIn' }} 
+      transition={{ 
+        type: "keyframes",
+        stiffness: 500,
+        damping: 20,
+        mass: 0.6,
+        duration: 0.5
+        }} 
     >
       <div className={styles.container}>
         <div className={styles.logo_name_cont}>
