@@ -394,90 +394,165 @@ export default function MapClient() {
 
 
   return (
-    <div className={styles.mapPage}>
+    <motion.div 
+      className={styles.mapPage}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+    >
       <div className={styles.container}>
-
-        <div className={styles.content}>
-
-          <div className={styles.sidebar}>
-            {/* Your existing sidebar content */}
-            <div className={styles.settingsCard}>
-              <h3 className={styles.cardTitle}>⚙️ Current Settings</h3>
+        <motion.div 
+          className={styles.content}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.3 }}
+        >
+          <motion.div 
+            className={styles.sidebar}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1, duration: 0.25 }}
+          >
+            <motion.div 
+              className={styles.settingsCard}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.2 }}
+            >
+              <motion.h3 
+                className={styles.cardTitle}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.15 }}
+              >
+                ⚙️ Current Settings
+              </motion.h3>
 
               {isFromHistory && (
-                <div style={{
-                  padding: '8px 12px',
-                  backgroundColor: '#dbeafe',
-                  border: '1px solid #3b82f6',
-                  borderRadius: '6px',
-                  color: '#1e40af',
-                  fontSize: '12px',
-                  marginBottom: '12px',
-                  fontWeight: '500'
-                }}>
+                <motion.div 
+                  style={{
+                    padding: '8px 12px',
+                    backgroundColor: '#dbeafe',
+                    border: '1px solid #3b82f6',
+                    borderRadius: '6px',
+                    color: '#1e40af',
+                    fontSize: '12px',
+                    marginBottom: '12px',
+                    fontWeight: '500'
+                  }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.22, duration: 0.15 }}
+                >
                   📂 Showing results from search history
-                </div>
+                </motion.div>
               )}
 
-              <div className={styles.settingItem}>
+              <motion.div 
+                className={styles.settingItem}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25, duration: 0.1 }}
+              >
                 <span className={styles.settingLabel}>📍 Region:</span>
                 <span className={styles.settingValue}>{preferences.region || 'Not set'}</span>
-              </div>
-              <div className={styles.settingItem}>
+              </motion.div>
+              <motion.div 
+                className={styles.settingItem}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.1 }}
+              >
                 <span className={styles.settingLabel}>🛍️ Place Type:</span>
                 <span className={styles.settingValue}>{preferences.placeType}</span>
-              </div>
-              <div className={styles.settingItem}>
+              </motion.div>
+              <motion.div 
+                className={styles.settingItem}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35, duration: 0.1 }}
+              >
                 <span className={styles.settingLabel}>⭐ Min Stars:</span>
                 <span className={styles.settingValue}>{preferences.minStars}</span>
-              </div>
-              <div className={styles.settingItem}>
+              </motion.div>
+              <motion.div 
+                className={styles.settingItem}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.1 }}
+              >
                 <span className={styles.settingLabel}>🎯 Search Radius:</span>
                 <span className={styles.settingValue}>{preferences.searchRadius} km</span>
-              </div>
+              </motion.div>
 
               {!places.length && preferences.region && !isFromHistory && (
-                <div style={{
-                  padding: '12px',
-                  backgroundColor: '#fef3c7',
-                  border: '1px solid #f59e0b',
-                  borderRadius: '8px',
-                  color: '#92400e',
-                  fontSize: '14px',
-                  marginTop: '12px'
-                }}>
+                <motion.div 
+                  style={{
+                    padding: '12px',
+                    backgroundColor: '#fef3c7',
+                    border: '1px solid #f59e0b',
+                    borderRadius: '8px',
+                    color: '#92400e',
+                    fontSize: '14px',
+                    marginTop: '12px'
+                  }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.45, duration: 0.15 }}
+                >
                   💡 No search results found. Go to Preferences to search for places.
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
 
-            <div >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.2 }}
+            >
               <h3 className={styles.result_cardTitle}>
                 📍 Results ({places.length})
                 {isFromHistory && <span style={{ fontSize: '12px', color: '#6b7280' }}> from history</span>}
               </h3>
 
               {places.length > 0 && (
-                <div className={styles.placesList}>
+                <motion.div 
+                  className={styles.placesList}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.55, duration: 0.2 }}
+                >
                   {places.map((place, idx) => (
-                    <div
+                    <motion.div
                       key={place.id}
                       className={`${styles.placeItem} ${selected_PlaceID_From_List === place.id ? styles.selectedPlace : ''}`}
                       onClick={() => handlePlaceClickOnList(place.id)}
                       style={{ cursor: 'pointer' }}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        delay: 0.6 + (idx * 0.03), 
+                        duration: 0.2 
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <div className={styles.placeName}>{place.displayName}</div>
                       <div className={styles.placeRating}>⭐ {place.rating || 'N/A'}</div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
 
+          </motion.div>
 
-          </div>
-
-          <div className={styles.mapContainer}>
+          <motion.div 
+            className={styles.mapContainer}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
             <div className={styles.mapHeader}>
               <h3 className={styles.mapTitle}>
                 <MapPinned className={styles.mapIcon} /> Map
@@ -493,11 +568,10 @@ export default function MapClient() {
               </div>
             ) : (
               <div ref={mapRef} className={styles.mapDiv} />
-
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
