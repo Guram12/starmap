@@ -112,6 +112,20 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <div
+          id="mobile-menu-overlay"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            zIndex: 98,
+            pointerEvents: 'none',
+            transition: 'background-color 0.3s ease'
+          }}
+        />
         <AuthProvider>
           <Header />
           {children}

@@ -10,8 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { gsap } from 'gsap';
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { BarLoader } from 'react-spinners';
-import { error } from 'console';
-import { div } from 'framer-motion/client';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
@@ -39,7 +38,7 @@ export default function PreferencesClient() {
       console.log('👤 User logged out - clearing places and loading state');
       setLoading(false);
     }
-   }, [isAuthenticated]);
+  }, [isAuthenticated]);
 
 
 
@@ -345,15 +344,23 @@ export default function PreferencesClient() {
 
   // ==========================================================================================================================
 
-
-
-
   return (
     <div
       ref={backgroundRef}
       className={styles.preferencesPage}
     >
-      <div className={styles.container}>
+      <motion.div
+        className={styles.container}
+        initial={{ opacity: 0, y: 100, scale: 0.8 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+          mass: 1,
+          duration: 0.6
+        }}
+      >
         {/* Hidden map for search functionality */}
         <div style={{ display: 'none' }}>
           <div ref={mapRef} style={{ width: '100px', height: '100px' }} />
@@ -515,7 +522,7 @@ export default function PreferencesClient() {
 
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

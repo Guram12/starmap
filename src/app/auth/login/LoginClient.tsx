@@ -3,10 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import styles from './Login.module.css'
 import { useAuth } from '@/app/AuthProvider'
-
-
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -16,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { login } = useAuth() // Get login function from context
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,11 +23,9 @@ export default function Login() {
     setError('')
 
     try {
-      // Use the login function from AuthProvider instead of direct fetch
       const result = await login(formData.username, formData.password)
-      
+
       if (result.success) {
-        // Redirect to map on successful login
         router.push('/map')
       } else {
         setError(result.error || 'Login failed')
@@ -42,18 +39,59 @@ export default function Login() {
 
   return (
     <div className={styles.loginPage}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Welcome Back</h1>
-        <p className={styles.subtitle}>Sign in to your StarMap account</p>
+      <motion.div
+        className={styles.container}
+        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 25,
+          mass: 0.8,
+          duration: 0.6
+        }}
+      >
+        <motion.h1
+          className={styles.title}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          Welcome Back
+        </motion.h1>
+        <motion.p
+          className={styles.subtitle}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          Sign in to your StarMap account
+        </motion.p>
 
         {error && (
-          <div className={styles.error}>
+          <motion.div
+            className={styles.error}
+            initial={{ opacity: 0, scale: 0.8, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          >
             {error}
-          </div>
+          </motion.div>
         )}
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
+        <motion.form
+          className={styles.form}
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <motion.div
+            className={styles.field}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
             <label htmlFor="username" className={styles.label}>
               Username or Email
             </label>
@@ -67,9 +105,14 @@ export default function Login() {
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
             />
-          </div>
+          </motion.div>
 
-          <div className={styles.field}>
+          <motion.div
+            className={styles.field}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.4 }}
+          >
             <label htmlFor="password" className={styles.label}>
               Password
             </label>
@@ -83,26 +126,36 @@ export default function Login() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
             />
-          </div>
+          </motion.div>
 
-          <button
+          <motion.button
             type="submit"
             className={styles.submitBtn}
             disabled={loading}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {loading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
+          </motion.button>
+        </motion.form>
 
-        <div className={styles.footer}>
+        <motion.div
+          className={styles.footer}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
           <p>
             Don&apos;t have an account?{' '}
             <Link href="/auth/register" className={styles.registerLink}>
               Register here
             </Link>
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
