@@ -42,6 +42,21 @@ export default function Header() {
     setIsBurgerMenuOpen(!isBurgerMenuOpen);
   }
 
+  useEffect(() => {
+    const overlay = document.getElementById('mobile-menu-overlay');
+    if (overlay) {
+      if (isBurgerMenuOpen) {
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+        overlay.style.pointerEvents = 'auto';
+        overlay.onclick = () => setIsBurgerMenuOpen(false);
+      } else {
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+        overlay.style.pointerEvents = 'none';
+        overlay.onclick = null;
+      }
+    }
+  }, [isBurgerMenuOpen]);
+
   // ----------------------------------------
   useEffect(() => {
     if (!isMobile) {
@@ -178,15 +193,15 @@ export default function Header() {
   return (
     <motion.header
       className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}
-      initial={{ y: '-150%' , x: '-50%' }} 
+      initial={{ y: '-150%', x: '-50%' }}
       animate={websiteLoaded ? { y: ['-100%', '50%', '0%'] } : {}}
-      transition={{ 
+      transition={{
         type: "keyframes",
         stiffness: 500,
         damping: 20,
         mass: 0.6,
         duration: 0.5
-        }} 
+      }}
     >
       <div className={styles.container}>
         <div className={styles.logo_name_cont}>
@@ -216,18 +231,58 @@ export default function Header() {
                   {isBurgerMenuOpen && (
                     <motion.div
                       className={styles.burgerMenu}
-                      initial={{ opacity: 0, y: -20, x: '-50%' }}
-                      animate={{ opacity: 1, y: 0, x: '-50%' }}
-                      exit={{ opacity: 0, y: -20, x: '-50%' }}
-                      style={{ left: '50%' }}
-                      transition={{ duration: 0.3 }}
+                      initial={{
+                        clipPath: "inset(10% 50% 90% 50% round 10px)",
+                        opacity: 0
+                      }}
+                      animate={{
+                        clipPath: "inset(0% 0% 0% 0% round 10px)",
+                        opacity: 1
+                      }}
+                      exit={{
+                        clipPath: "inset(10% 50% 90% 50% round 10px)",
+                        opacity: 0
+                      }}
+
+                      style={{
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                      }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0,
+                        duration: 0.5,
+                        delayChildren: 0.3,
+                        staggerChildren: 0.1
+                      }}
                     >
                       <div className={styles.navItemsMobile}>
-                        {burgerMenuItems.map((item) => (
-                          <div
+                        {burgerMenuItems.map((item, index) => (
+                          <motion.div
                             className={styles.nav_button_with_icon}
                             key={item.href}
                             onClick={() => handle_burger_page_click(item.href)}
+                            initial={{
+                              opacity: 0,
+                              scale: 0.3,
+                              filter: "blur(20px)"
+                            }}
+                            animate={{
+                              opacity: 1,
+                              scale: 1,
+                              filter: "blur(0px)"
+                            }}
+                            exit={{
+                              opacity: 0,
+                              scale: 0.3,
+                              filter: "blur(20px)"
+                            }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 24,
+                              delay: index * 0.04
+                            }}
                           >
                             {renderBurgerIcon(item.href)}
                             <Link
@@ -252,11 +307,12 @@ export default function Header() {
                                 }}
                               />
                             )}
-
-                          </div>
+                          </motion.div>
                         ))}
                       </div>
                     </motion.div>
+
+
                   )}
                 </AnimatePresence>
 
