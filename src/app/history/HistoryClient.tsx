@@ -5,6 +5,7 @@ import { useAuth } from '../AuthProvider';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './History.module.css';
+import { motion } from 'framer-motion';
 
 
 export default function HistoryClient() {
@@ -112,18 +113,33 @@ export default function HistoryClient() {
 
   if (!isAuthenticated) {
     return (
-      <div className={styles.historyPage}>
+      <motion.div 
+        className={styles.historyPage}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className={styles.container}>
-          <div className={styles.header}>
+          <motion.div 
+            className={styles.header}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+          >
             <h1 className={styles.title}>
               📊 Search History
             </h1>
             <p className={styles.subtitle}>
               View and revisit your previous searches
             </p>
-          </div>
+          </motion.div>
 
-          <div className={styles.searchHistory}>
+          <motion.div 
+            className={styles.searchHistory}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
             <div className={styles.notLoggedIn}>
               <div className={styles.authIcon}>🔐</div>
               <h3>Authentication Required</h3>
@@ -132,93 +148,179 @@ export default function HistoryClient() {
                 Go to Login / Register
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
 
   return (
-    <div className={styles.historyPage}>
-      <div className={styles.container}>
-        <div className={styles.header}>
+    <motion.div 
+      className={styles.historyPage}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+    >
+      <motion.div className={styles.container}>
+        <motion.div 
+          className={styles.header}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.3 }}
+        >
           <h1 className={styles.title}>
             📊 Search History
           </h1>
           <p className={styles.subtitle}>
             View and revisit your previous searches
           </p>
-        </div>
+        </motion.div>
 
-        <div className={styles.actions}>
+        <motion.div 
+          className={styles.actions}
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.25 }}
+        >
           <Link href="/preferences" className={`${styles.actionBtn} ${styles.preferencesBtn}`}>
             ⚙️ Preferences
           </Link>
           {searchHistory.length > 0 && (
-            <button
+            <motion.button
               onClick={handleClearHistory}
               className={`${styles.actionBtn} ${styles.clearBtn}`}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15, duration: 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               🗑️ Clear History
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
 
         {!isAuthenticated ? (
-          <div className={styles.searchHistory}>
+          <motion.div 
+            className={styles.searchHistory}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+          >
             <div className={styles.notLoggedIn}>
               <p>🔐 Please log in to view search history</p>
             </div>
-          </div>
+          </motion.div>
         ) : loading ? (
-          <div className={styles.searchHistory}>
+          <motion.div 
+            className={styles.searchHistory}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.25 }}
+          >
             <div className={styles.loading}>
               <div className={styles.spinner}></div>
               <p>Loading search history...</p>
             </div>
-          </div>
+          </motion.div>
         ) : (
-          <div className={styles.searchHistory}>
+          <motion.div 
+            className={styles.searchHistory}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+          >
             {searchHistory.length > 0 && (
               <>
-                <div className={styles.statsSection}>
-                  <div className={styles.stats}>
-                    <div className={styles.statItem}>
+                <motion.div 
+                  className={styles.statsSection}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.25 }}
+                >
+                  <motion.div 
+                    className={styles.stats}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.35, duration: 0.3 }}
+                  >
+                    <motion.div 
+                      className={styles.statItem}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4, duration: 0.2 }}
+                    >
                       <span className={styles.statValue}>{totalSearches}</span>
                       <span className={styles.statLabel}>Total Searches</span>
-                    </div>
-                    <div className={styles.statItem}>
+                    </motion.div>
+                    <motion.div 
+                      className={styles.statItem}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.45, duration: 0.2 }}
+                    >
                       <span className={styles.statValue}>{uniqueRegions}</span>
                       <span className={styles.statLabel}>Unique Regions</span>
-                    </div>
-                    <div className={styles.statItem}>
+                    </motion.div>
+                    <motion.div 
+                      className={styles.statItem}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5, duration: 0.2 }}
+                    >
                       <span className={styles.statValue}>{totalResults}</span>
                       <span className={styles.statLabel}>Total Results</span>
-                    </div>
-                    <div className={styles.statItem}>
+                    </motion.div>
+                    <motion.div 
+                      className={styles.statItem}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.55, duration: 0.2 }}
+                    >
                       <span className={styles.statValue}>{averageResults}</span>
                       <span className={styles.statLabel}>Avg per Search</span>
-                    </div>
-                  </div>
-                </div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
 
               </>
             )}
 
             {searchHistory.length === 0 ? (
-              <div className={styles.empty}>
+              <motion.div 
+                className={styles.empty}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+              >
                 <p>🔍 No search history yet</p>
                 <p>Start exploring places to see your searches here!</p>
-              </div>
+              </motion.div>
             ) : (
-              <div className={styles.historyList}>
-                {searchHistory.map((item) => (
-                  <div
+              <motion.div 
+                className={styles.historyList}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.3 }}
+              >
+                {searchHistory.map((item, idx) => (
+                  <motion.div
                     key={item.id}
                     className={styles.historyItem}
                     onClick={() => handleSelectSearch(item)}
                     title="Click to use these settings and go to map"
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      delay: 0.65 + (idx * 0.03), 
+                      duration: 0.25 
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      x: 5
+                    }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className={styles.searchInfo}>
                       <div className={styles.mainInfo}>
@@ -238,13 +340,13 @@ export default function HistoryClient() {
                     <div className={styles.timestamp}>
                       {formatDate(item.searchedAt)}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

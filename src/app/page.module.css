@@ -53,9 +53,10 @@
 
 .heroActions {
   display: flex;
-  gap: 1rem;
+  gap: 50px;
   justify-content: center;
   flex-wrap: wrap;
+
 }
 
 .primaryBtn {
@@ -247,6 +248,10 @@
     width: 100%;
     max-width: 300px;
   }
+
+.secondaryBtn{
+  margin-top: 50px !important;
+}
 
   .featureGrid {
     grid-template-columns: 1fr;
