@@ -534,7 +534,6 @@ export default function MapClient() {
                         delay: 0.6 + (idx * 0.03), 
                         duration: 0.2 
                       }}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className={styles.placeName}>{place.displayName}</div>
