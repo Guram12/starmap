@@ -308,10 +308,6 @@ export default function MapClient() {
   `;
   };
 
-  useEffect(() => {
-    console.log('places ===>>>> ', places)
-  }, [places]);
-
 
 
   const handlePlaceClickOnList = (placeId: string) => {
