@@ -312,12 +312,10 @@ export default function MapClient() {
 
   const handlePlaceClickOnList = (placeId: string) => {
     setSelected_PlaceID_From_List(placeId);
-    // Close all info windows first
     markerInfoPairs.forEach(({ infoWindow }) => {
       infoWindow.close();
     });
 
-    // Find the place by ID to get its index
     const placeIndex = places.findIndex(place => place.id === placeId);
 
     if (placeIndex !== -1 && markerInfoPairs[placeIndex]) {
