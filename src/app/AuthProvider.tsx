@@ -22,7 +22,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Check if user is logged in on app start
   useEffect(() => {
     checkAuthStatus()
   }, [])
