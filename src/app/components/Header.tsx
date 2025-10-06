@@ -174,7 +174,6 @@ export default function Header() {
           width: itemRect.width,
         });
       } else {
-        // Hide indicator if no matching nav item
         setIndicatorStyle({ left: 0, width: 0 });
       }
     };
