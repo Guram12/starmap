@@ -77,20 +77,3 @@ export default function Page() {
 }
 
 
-
-// CREATE DATABASE starmap_db;
-// CREATE USER starmap_user WITH ENCRYPTED PASSWORD 'starmap_password';
-// GRANT ALL PRIVILEGES ON DATABASE starmap_db TO starmap_user;
-
-
-
-
-
-
-
-// testing lybraries
-// npm install --save-dev jest @testing-library/react @testing-library/jest-dom babel-jest
-
-
-
-// FWkiWCjmUJUgqz14Sv4ssXwF
