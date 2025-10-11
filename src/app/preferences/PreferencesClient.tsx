@@ -24,6 +24,18 @@ export default function PreferencesClient() {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
 
+  // ============================================================================================================
+  // ============================================================================================================
+  // ============================  for future search settings i should add this fields ==========================
+  // ============================================================================================================
+  // ============================================================================================================
+
+  // const [openNow, setOpenNow] = useState<boolean>(false);
+  // const [priceLevel, setPriceLevel] = useState<number[]>([1, 2, 3, 4]); // Array for multiple price levels
+  // const [keyword, setKeyword] = useState<string>('');
+  // const [includeRatingsOnly, setIncludeRatingsOnly] = useState<boolean>(false);
+  // const [businessStatus, setBusinessStatus] = useState<'all' | 'operational_only'>('all');
+
   const [show_search_button, setShow_search_button] = useState<boolean>(true);
 
 
@@ -366,7 +378,7 @@ export default function PreferencesClient() {
           <div ref={mapRef} style={{ width: '100px', height: '100px' }} />
         </div>
 
-        <motion.div 
+        <motion.div
           className={styles.header}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -380,14 +392,14 @@ export default function PreferencesClient() {
           </p>
         </motion.div>
 
-        <motion.form 
-          className={styles.form} 
+        <motion.form
+          className={styles.form}
           onSubmit={(e) => { e.preventDefault(); savePreferences(); setShow_search_button(false); }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          <motion.div 
+          <motion.div
             className={styles.field}
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -430,7 +442,7 @@ export default function PreferencesClient() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={styles.field}
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -453,7 +465,7 @@ export default function PreferencesClient() {
             </select>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={styles.field}
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -484,7 +496,7 @@ export default function PreferencesClient() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={styles.field}
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -513,7 +525,7 @@ export default function PreferencesClient() {
 
 
           {searchError === null ? null :
-            <motion.div 
+            <motion.div
               style={{ width: '100%' }}
               initial={{ opacity: 0, scale: 0.8, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -528,7 +540,7 @@ export default function PreferencesClient() {
 
 
           {loading && (
-            <motion.div 
+            <motion.div
               className={styles.loading_cont}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -538,7 +550,7 @@ export default function PreferencesClient() {
             </motion.div>
           )}
 
-          <motion.div 
+          <motion.div
             className={styles.actions}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
