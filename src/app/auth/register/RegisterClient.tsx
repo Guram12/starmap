@@ -19,10 +19,6 @@ export default function RegisterClient() {
   const router = useRouter()
   const { login } = useAuth()
 
-  useEffect(() => {
-    console.log('loading:', loading)
-  }, [loading])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
