@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { gsap } from 'gsap';
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { BarLoader } from 'react-spinners';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 
 type PlaceType = 'restaurant' | 'lodging' | 'tourist_attraction' | 'shopping_mall' | 'hospital';
@@ -27,7 +27,6 @@ export default function PreferencesClient() {
   // ============================================================================================================
   // ============================================================================================================
   // ============================  for future search settings i should add this fields ==========================
-  // ============================================================================================================
   // ============================================================================================================
 
   // const [openNow, setOpenNow] = useState<boolean>(false);
