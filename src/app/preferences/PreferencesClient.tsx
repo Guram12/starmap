@@ -24,15 +24,21 @@ export default function PreferencesClient() {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
 
-  // ============================================================================================================
+  useEffect(() => {
+    console.log('--- PreferencesClient mounted ---');
+  }, []);
+
   // ============================================================================================================
   // ============================  for future search settings i should add this fields ==========================
-  // ============================================================================================================
 
   // const [openNow, setOpenNow] = useState<boolean>(false);
+  
   // const [priceLevel, setPriceLevel] = useState<number[]>([1, 2, 3, 4]); // Array for multiple price levels
+
   // const [keyword, setKeyword] = useState<string>('');
+
   // const [includeRatingsOnly, setIncludeRatingsOnly] = useState<boolean>(false);
+
   // const [businessStatus, setBusinessStatus] = useState<'all' | 'operational_only'>('all');
 
   const [show_search_button, setShow_search_button] = useState<boolean>(true);
