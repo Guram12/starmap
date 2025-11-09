@@ -41,9 +41,10 @@ export const metadata: Metadata = {
     template: "%s | StarMap"
   },
   description: "Discover restaurants, hotels, tourist attractions and more based on star ratings and location preferences. Search globally with personalized recommendations.",
+  manifest: '/manifest.json',
   keywords: [
     "places finder",
-    "restaurant finder", 
+    "restaurant finder",
     "hotel search",
     "tourist attractions",
     "star ratings",
@@ -128,7 +129,7 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/starmap_logo.svg" />
         <link rel="apple-touch-icon" href="/starmap_logo.svg" />
         <link rel="manifest" href="/manifest.json" />
-        
+
         {/* Structured Data */}
         <script
           type="application/ld+json"
@@ -154,7 +155,7 @@ export default function RootLayout({
             })
           }}
         />
-        
+
         {/* Google Analytics */}
         {process.env.NEXT_PUBLIC_GOOGLE_MEASUREMENT_ID && (
           <>
@@ -194,7 +195,7 @@ export default function RootLayout({
             transition: 'background-color 0.3s ease'
           }}
         />
-        <div
+        {/* <div
           id="mobile-menu-overlay"
           style={{
             position: 'fixed',
@@ -207,7 +208,7 @@ export default function RootLayout({
             pointerEvents: 'none',
             transition: 'background-color 0.3s ease'
           }}
-        />
+        /> */}
         <AuthProvider>
           <Header />
           {children}

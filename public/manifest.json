@@ -1,0 +1,27 @@
+{
+  "name": "StarMap - Find Your Perfect Places",
+  "short_name": "StarMap",
+  "description": "Discover restaurants, hotels, and attractions with personalized recommendations based on your preferences and ratings",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "navigation", "lifestyle"],
+  "scope": "/",
+  "lang": "en"
+}
