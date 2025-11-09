@@ -1,23 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import prisma from '@/lib/prisma' // Change this line
-
-
-
+import prisma from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value
 
-
+    // No token = not logged in (return 401, not 500)
     if (!token) {
       return NextResponse.json(
-        { error: 'No token provided' },
+        { authenticated: false, user: null },
         { status: 401 }
       )
     }
+
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number; username: string }
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!) as { 
+        userId: number; 
+        username: string 
+      }
+    } catch (jwtError) {
+      // Invalid/expired token = return 401, not 500
+      console.warn('Invalid JWT token:', jwtError)
+      return NextResponse.json(
+        { authenticated: false, user: null, error: 'Invalid token' },
+        { status: 401 }
+      )
+    }
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -29,25 +40,31 @@ export async function GET(request: NextRequest) {
         createdAt: true
       }
     })
+
+    // User not found in database
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { authenticated: false, user: null, error: 'User not found' },
         { status: 401 }
       )
     }
 
-    return NextResponse.json({ user })
+    // Success - user is authenticated
+    return NextResponse.json({ 
+      authenticated: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    })
 
-
-  } catch (_error) {
+  } catch (error) {
+    // Only real server errors (database connection, etc.) should return 500
+    console.error('Auth check server error:', error)
     return NextResponse.json(
-      { success: false, error: 'Authentication check failed' },
+      { authenticated: false, user: null, error: 'Server error' },
       { status: 500 }
-    );
+    )
   }
 }
-
-
-
-
-
