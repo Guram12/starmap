@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -23,7 +22,7 @@ model User {
 
 // Updated SearchHistory model to include places data
 model SearchHistory {
-  id           Int      @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   userId       Int
   region       String
   placeType    String
@@ -46,17 +45,17 @@ model SearchHistory {
 model SearchPlace {
   id               Int     @id @default(autoincrement())
   searchHistoryId  Int
-  placeId          String 
+  placeId          String
   displayName      String
   rating           Float?
   formattedAddress String?
   latitude         Float
   longitude        Float
-  types            String? 
+  types            String?
   priceLevel       Int?
   websiteURI       String?
   phoneNumber      String?
-  photoUrl         String? 
+  photoUrl         String?
 
   // Relation to SearchHistory
   searchHistory SearchHistory @relation(fields: [searchHistoryId], references: [id], onDelete: Cascade)
