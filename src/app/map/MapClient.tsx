@@ -108,7 +108,7 @@ export default function MapClient() {
         timestamp: results.timestamp
       });
     }
-  }, [isLoaded]); // Only run when Google Maps is loaded
+  }, [isLoaded]);
 
   // ============================ Center map when preferences load and places are available  =======================
   useEffect(() => {
@@ -330,6 +330,18 @@ export default function MapClient() {
       window.scrollTo({ top: window.scrollY, behavior: 'smooth' });
     }
   };
+  // ========================================  show set preferences warning window =======================================
+
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+
+  useEffect(() => {
+    if (prefsLoaded && !preferences.region) {
+      setShowPreferencesModal(true);
+    } else {
+      setShowPreferencesModal(false);
+    }
+  }, [prefsLoaded, preferences.region]);
+
 
   // =====================================================================================================================
   if (!prefsLoaded) {
@@ -341,79 +353,66 @@ export default function MapClient() {
     );
   }
 
-  if (preferences.region === '') {
-    return (
-      <div className={styles.no_region_container}>
-        <motion.div
-          className={styles.no_region_errorMessage}
-          initial={{ opacity: 0, y: 100, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            mass: 1,
-            duration: 0.6,
-            delay: 0.3,
-          }}
-        >
-          <p>⚠️ No region set. Please go to Preferences to set your search criteria.</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 100, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            mass: 1,
-            duration: 0.6,
-            // delay: 0.1,
-          }}
-        >
-          <button
-            className={styles.setregion_button}
-
-          >
-            <a href="/preferences?f=region" className={styles.actionBtn}>
-              ⚙️ Go to Preferences
-            </a>
-          </button>
-        </motion.div>
-
-      </div>
-    );
-  }
-
 
   return (
-    <motion.div 
+    <motion.div
       className={styles.mapPage}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
     >
+
+      {/* show window over other content when no preferences are selected  */}
+
+      {showPreferencesModal && (
+        <div className={styles.noPreferencesOverlay}>
+          <div className={styles.no_pref_child_container}>
+            <h1 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Interactive Map</h1>
+            <h2 className={styles.noPreferencesTitle}>⚙️ Set Your Preferences</h2>
+            <p className={styles.noPreferencesText}>
+              To view places on the map, please set your preferences first.
+            </p>
+
+            {/* Add SEO content */}
+            <div style={{ marginTop: '20px', textAlign: 'left', fontSize: '14px', color: '#6b7280' }}>
+              <h3 style={{ fontSize: '16px', marginBottom: '8px', color: '#374151' }}>Map Features:</h3>
+              <ul style={{ paddingLeft: '20px', lineHeight: '1.6' }}>
+                <li>Interactive markers showing place locations</li>
+                <li>Detailed information cards with photos</li>
+                <li>Star ratings and reviews</li>
+                <li>Direct links to Google Maps</li>
+                <li>Customizable search radius and filters</li>
+              </ul>
+            </div>
+
+            <a href="/preferences?f=region" className={styles.noPreferencesButton}>
+              Go to Preferences
+            </a>
+          </div>
+        </div>
+      )}
+
+
       <div className={styles.container}>
-        <motion.div 
+        <motion.div
           className={styles.content}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.3 }}
         >
-          <motion.div 
+          <motion.div
             className={styles.sidebar}
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, duration: 0.25 }}
           >
-            <motion.div 
+            <motion.div
               className={styles.settingsCard}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.2 }}
             >
-              <motion.h3 
+              <motion.h3
                 className={styles.cardTitle}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -423,7 +422,7 @@ export default function MapClient() {
               </motion.h3>
 
               {isFromHistory && (
-                <motion.div 
+                <motion.div
                   style={{
                     padding: '8px 12px',
                     backgroundColor: '#dbeafe',
@@ -442,7 +441,7 @@ export default function MapClient() {
                 </motion.div>
               )}
 
-              <motion.div 
+              <motion.div
                 className={styles.settingItem}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -451,7 +450,7 @@ export default function MapClient() {
                 <span className={styles.settingLabel}>📍 Region:</span>
                 <span className={styles.settingValue}>{preferences.region || 'Not set'}</span>
               </motion.div>
-              <motion.div 
+              <motion.div
                 className={styles.settingItem}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -460,7 +459,7 @@ export default function MapClient() {
                 <span className={styles.settingLabel}>🛍️ Place Type:</span>
                 <span className={styles.settingValue}>{preferences.placeType}</span>
               </motion.div>
-              <motion.div 
+              <motion.div
                 className={styles.settingItem}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -469,7 +468,7 @@ export default function MapClient() {
                 <span className={styles.settingLabel}>⭐ Min Stars:</span>
                 <span className={styles.settingValue}>{preferences.minStars}</span>
               </motion.div>
-              <motion.div 
+              <motion.div
                 className={styles.settingItem}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -480,7 +479,7 @@ export default function MapClient() {
               </motion.div>
 
               {!places.length && preferences.region && !isFromHistory && (
-                <motion.div 
+                <motion.div
                   style={{
                     padding: '12px',
                     backgroundColor: '#fef3c7',
@@ -510,7 +509,7 @@ export default function MapClient() {
               </h3>
 
               {places.length > 0 && (
-                <motion.div 
+                <motion.div
                   className={styles.placesList}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -524,9 +523,9 @@ export default function MapClient() {
                       style={{ cursor: 'pointer' }}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ 
-                        delay: 0.6 + (idx * 0.03), 
-                        duration: 0.2 
+                      transition={{
+                        delay: 0.6 + (idx * 0.03),
+                        duration: 0.2
                       }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -540,7 +539,7 @@ export default function MapClient() {
 
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={styles.mapContainer}
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}

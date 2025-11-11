@@ -5,6 +5,73 @@
   overflow: hidden;
 }
 
+/* ==============================  no preferences overlay styles ============================== */
+
+.noPreferencesOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Darker overlay to see map better */
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px); /* Optional: adds blur effect */
+}
+
+
+.no_pref_child_container {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative; /* Ensure modal is on top */
+  z-index: 100; /* Higher than overlay */
+}
+
+.noPreferencesTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.noPreferencesText {
+  font-size: 16px;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.noPreferencesButton {
+  display: inline-block;
+  background: #10b981;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+
+.noPreferencesButton:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ==================================================================================================== */
+
+
 .container {
   max-width: 90%;
   margin: 0 auto;
@@ -303,7 +370,7 @@
   height: 100% !important;
   border-radius: 12px;
   background-color: #FFFFFF;
-  z-index: 10;
+  z-index: 1; /* Ensure map is behind overlay */
 }
 
 .placeholderIcon {
