@@ -125,7 +125,6 @@ export default function MapClient() {
 
   // Save to history only for fresh searches, not when loading from history
   useEffect(() => {
-    // Only save to database if authenticated AND we have places AND it's not from history
     if (isAuthenticated && places.length > 0 && preferences.region && !isFromHistory) {
       console.log('💾 MAP PAGE: Saving fresh search to history with places');
       saveSearchToHistory({
@@ -205,21 +204,17 @@ export default function MapClient() {
         content: markerElement
       });
 
-      // Add info window with image support
       const infoWindow = new google.maps.InfoWindow({
         content: createInfoWindowContent(place)
       });
 
       markerElement.addEventListener('click', () => {
-        // Close all info windows first
         markerInfoPairs.forEach(({ infoWindow: otherInfoWindow }) => {
           otherInfoWindow.close();
         });
 
-        // Open this info window
         infoWindow.open(map, marker);
 
-        // Update selected place ID
         setSelected_PlaceID_From_List(place.id);
       });
       return { marker, infoWindow };

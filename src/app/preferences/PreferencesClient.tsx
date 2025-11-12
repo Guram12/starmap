@@ -245,7 +245,6 @@ export default function PreferencesClient() {
         saveSearchWithPlacesToDatabase();
       } else {
         console.log('👤 PREFERENCES: Non-authenticated user - only saving to localStorage');
-        // Ensure loading is set to false for non-authenticated users
         setLoading(false);
       }
     }
