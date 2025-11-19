@@ -38,7 +38,6 @@ export default function HistoryClient() {
   };
 
   const handleSelectSearch = (search: typeof searchHistory[0]) => {
-    console.log('🔄 HISTORY: Selecting search:', search);
 
     // Save selected search preferences
     const preferences = {
@@ -50,7 +49,6 @@ export default function HistoryClient() {
     };
 
     localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
-    console.log('✅ HISTORY: Preferences saved to localStorage');
 
     // Convert database places back to the format expected by map
     const placesForMap = search.places.map(place => ({

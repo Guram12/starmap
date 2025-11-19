@@ -65,15 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('isLoggedIn')
         }
       } else {
-        // Any non-200 status = not authenticated (clear state silently)
         setUser(null)
         localStorage.removeItem('isLoggedIn')
         
-        // Only log if it's an actual server error (500)
         if (response.status === 500) {
           console.warn('Auth server error')
         }
-        // Don't log 401 - it's expected when token expires
       }
     } catch (error) {
       // Network error - clear state silently
@@ -125,7 +122,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       // Silently handle logout errors
     } finally {
-      // Always clear local state regardless of API response
       setUser(null)
       localStorage.removeItem('isLoggedIn')
       setLoading(false)
