@@ -223,14 +223,13 @@ export default function PreferencesClient() {
             lat: place.location.lat(),
             lng: place.location.lng()
           },
-          // Extract photo URL here
           photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
             ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
             : null
         })),
         searchParams: { region, placeType, minStars, searchRadius },
         timestamp: new Date().toISOString(),
-        fromHistory: false // Mark as fresh search
+        fromHistory: false 
       };
 
       // Always save to localStorage (overwrites previous search for non-authenticated users)
@@ -248,7 +247,7 @@ export default function PreferencesClient() {
         setLoading(false);
       }
     }
-  }, [places, saveSearchWithPlacesToDatabase, isAuthenticated]); // Add missing dependencies
+  }, [places, saveSearchWithPlacesToDatabase, isAuthenticated]); 
 
 
   // ===================================================  focus region input ===================================================

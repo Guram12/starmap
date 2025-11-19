@@ -58,7 +58,6 @@ export default function MapClient() {
 
   //=====================================    Load preferences and search results from localStorage     ====================================
   useEffect(() => {
-    // Load preferences
     const savedPrefs = localStorage.getItem('starmap-preferences');
     if (savedPrefs) {
       const prefs = JSON.parse(savedPrefs);
@@ -73,7 +72,6 @@ export default function MapClient() {
     setPrefsLoaded(true);
   }, []);
 
-  // Separate effect for loading search results after Google Maps is loaded
   useEffect(() => {
     if (!isLoaded || !window.google) return;
 
