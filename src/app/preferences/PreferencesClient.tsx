@@ -25,14 +25,13 @@ export default function PreferencesClient() {
 
   const [show_search_button, setShow_search_button] = useState<boolean>(true);
 
-
   const { mapRef, map, isLoaded } = useGoogleMap();
   const { places, loading, setLoading, error: searchError, setError, searchPlaces, geocodeLocation } = usePlacesSearch();
   const { isAuthenticated } = useAuth();
 
+  // ================================================ handle logout ================================================
 
   useEffect(() => {
-    console.log('--- isAuthenticated changed ---', isAuthenticated);
     if (!isAuthenticated) {
       console.log('👤 User logged out - clearing places and loading state');
       setLoading(false);
@@ -229,7 +228,7 @@ export default function PreferencesClient() {
         })),
         searchParams: { region, placeType, minStars, searchRadius },
         timestamp: new Date().toISOString(),
-        fromHistory: false 
+        fromHistory: false
       };
 
       // Always save to localStorage (overwrites previous search for non-authenticated users)
@@ -247,7 +246,7 @@ export default function PreferencesClient() {
         setLoading(false);
       }
     }
-  }, [places, saveSearchWithPlacesToDatabase, isAuthenticated]); 
+  }, [places, saveSearchWithPlacesToDatabase, isAuthenticated]);
 
 
   // ===================================================  focus region input ===================================================
