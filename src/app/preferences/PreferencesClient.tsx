@@ -119,10 +119,7 @@ export default function PreferencesClient() {
       };
 
       localStorage.setItem('starmap-preferences', JSON.stringify(preferences));
-
       if (map && isLoaded) {
-        console.log('🔍 PREFERENCES: Starting search with saved preferences');
-
         const location = await geocodeLocation(region);
 
         if (location) {
