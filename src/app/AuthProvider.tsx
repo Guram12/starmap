@@ -73,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      // Network error - clear state silently
       setUser(null)
       localStorage.removeItem('isLoggedIn')
     } finally {

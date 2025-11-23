@@ -150,17 +150,9 @@ export default function PreferencesClient() {
   // ===================================================  save to database ===================================================
 
   const saveSearchWithPlacesToDatabase = useCallback(async () => {
-    // Only save to database if user is authenticated
     if (!isAuthenticated) {
-      console.log('👤 PREFERENCES: User not authenticated - skipping database save');
       return;
     }
-
-    console.log('💾 PREFERENCES: Saving search with places to database:', {
-      placesCount: places.length,
-      region,
-      placeType
-    });
 
     try {
       const response = await fetch('/api/search-history', {
