@@ -179,7 +179,7 @@ export default function PreferencesClient() {
             priceLevel: place.priceLevel ? Number(place.priceLevel) : null,
             websiteURI: place.websiteURI ?? null,
             nationalPhoneNumber: place.nationalPhoneNumber ?? null,
-            // Add photo URL extraction
+
             photoUrl: place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function'
               ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 150 })
               : null
@@ -231,7 +231,6 @@ export default function PreferencesClient() {
       if (isAuthenticated) {
         saveSearchWithPlacesToDatabase();
       } else {
-        console.log('👤 PREFERENCES: Non-authenticated user - only saving to localStorage');
         setLoading(false);
       }
     }
