@@ -130,7 +130,6 @@ export default function PreferencesClient() {
             minRating: minStars
           }, region);
 
-          console.log('✅ PREFERENCES: Search completed, storing results');
         } else {
           setError('Could not find the specified location');
         }

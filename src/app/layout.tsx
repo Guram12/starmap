@@ -4,9 +4,6 @@ import "./globals.css";
 import Header from "./components/Header";
 import { AuthProvider } from "./AuthProvider";
 import CookieBanner from "@/lib/CookieBanner";
-// import { Analytics } from '@vercel/analytics/react';
-// import { SpeedInsights } from '@vercel/speed-insights/next';
-
 
 
 
