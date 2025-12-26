@@ -72,11 +72,7 @@ export function usePlacesSearch() {
     // Create cache key
     const cacheKey = `${params.location.lat()}-${params.location.lng()}-${params.radius}-${params.type}-${params.minRating || 0}`;
 
-    console.log('🔍 PLACES SEARCH REQUEST:', {
-      locationName,
-      cacheKey,
-      timestamp: new Date().toISOString()
-    });
+
 
     // Check cache first
     const cached = cache.current.get(cacheKey);
