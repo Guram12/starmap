@@ -98,13 +98,7 @@ export default function MapClient() {
         location: new google.maps.LatLng(place.location.lat, place.location.lng)
       }));
 
-
       setPlaces(placesWithLatLng);
-      console.log('✅ MAP PAGE: Loaded search results from localStorage:', {
-        count: placesWithLatLng.length,
-        fromHistory: !!results.fromHistory,
-        timestamp: results.timestamp
-      });
     }
   }, [isLoaded]);
 
